@@ -3,12 +3,12 @@
 Epsilon-differential privacy enforcement and empirical membership inference
 validation for synthetic autonomous-vehicle training data.
 
-**IT22309556, S. A. S. D. Priyadarshi**
+**IT22309556, Priyadarshi S.A.S.D.**
 
 The component enforces ε-DP at two points in the pipeline and validates the
 guarantee empirically rather than assuming it:
 
-1. **Calibration:** the Laplace mechanism privatises aggregate statistics
+1. **Calibration:** the Laplace mechanism privatizes aggregate statistics
    before they configure the CARLA simulator. Seven queries at ε = 1.8 each
    compose to a total of 12.6, reported as `calibration_epsilon_spent`.
 2. **Training:** Opacus DP-SGD applies per-sample gradient clipping and
@@ -53,7 +53,7 @@ all off by default so standalone results are unchanged:
 - `build_certificate.py --utility-results <utility_results.json>` fills the
   utility section of the joint certificate.
 
-## Artefact layout
+## Artifact layout
 
 Runs are namespaced by seed, so repeating a configuration under a new seed is
 additive rather than destructive:
@@ -71,11 +71,11 @@ outputs/figures/*.png
 
 | Decision | Reason |
 | --- | --- |
-| SGD with momentum for DP training | Adam's second-moment estimate accumulates injected DP noise, destabilising training across every learning rate from 1e-5 to 1e-4 |
+| SGD with momentum for DP training | Adam's second-moment estimate accumulates injected DP noise, destabilizing training across every learning rate from 1e-5 to 1e-4 |
 | Index duplication, not `WeightedRandomSampler` | Opacus replaces the DataLoader sampler inside `make_private` because RDP accounting requires Poisson subsampling |
 | GroupNorm, not BatchNorm | Opacus rejects BatchNorm; using GroupNorm avoids depending on `ModuleValidator.fix` |
 | 448×336 input, 8× downsampling, max pooling | At 256×256 with 16× downsampling and average pooling, 62% of positive targets fell below the resolvable size |
-| Frames with only sub-threshold targets excluded | Labelling them negative asserts the absence of a present-but-unresolvable object; follows the KITTI minimum-size convention |
+| Frames with only sub-threshold targets excluded | Labeling them negative asserts the absence of a present-but-unresolvable object; follows the KITTI minimum-size convention |
 | AUC as the headline metric | The test set is ~10% positive while training is rebalanced 50/50, so accuracy reflects the prior shift; AUC is threshold-independent |
 | Size-matched MIA evaluation sets | Unbalanced sets make attack accuracy track the class prior rather than attack skill |
 

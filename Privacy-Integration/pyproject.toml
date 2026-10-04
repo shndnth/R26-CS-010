@@ -7,7 +7,7 @@ name = "privacy-integration"
 version = "1.0.0"
 description = "Privacy Integration component for R26-CS-010: epsilon-differential privacy enforcement and empirical membership inference validation for synthetic AV data"
 requires-python = ">=3.11"
-authors = [{ name = "S. A. S. D. Priyadarshi", email = "it22309556@my.sliit.lk" }]
+authors = [{ name = "Priyadarshi S.A.S.D.", email = "it22309556@my.sliit.lk" }]
 
 dependencies = [
     "torch==2.5.1",

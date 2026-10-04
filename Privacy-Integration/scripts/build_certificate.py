@@ -197,7 +197,7 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
         "version": CERTIFICATE_VERSION,
         "project": "R26-CS-010",
         "component": "Privacy Integration",
-        "issued_by": "IT22309556 (S. A. S. D. Priyadarshi)",
+        "issued_by": "IT22309556 (Priyadarshi S.A.S.D.)",
         "issued_to": company,
         "generated_at": utc_timestamp(),
         "scope": (

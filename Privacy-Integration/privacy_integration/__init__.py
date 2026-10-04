@@ -3,4 +3,4 @@
 from __future__ import annotations
 
 __version__ = "1.0.0"
-__author__ = "S. A. S. D. Priyadarshi (IT22309556)"
+__author__ = "Priyadarshi S.A.S.D. (IT22309556)"

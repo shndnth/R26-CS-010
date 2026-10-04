@@ -9,7 +9,7 @@
 
   <h1>MURAGALA</h1>
   <p><b>Privacy-Enhanced Synthetic Data Generation for Autonomous Vehicle Training</b></p>
-  <p>A framework that guards the point where real data enters a synthetic driving dataset: differential privacy on the statistics that calibrate the simulator and on the models trained from it, attacks that test those guarantees, a measure of what usefulness survives, and an independent audit against GDPR and the Sri Lanka PDPA.</p>
+  <p>A framework that guards the point where real data enters a synthetic driving dataset: differential privacy on the statistics that calibrate the simulator and on the models trained from it, attacks that test those guarantees, a measure of what usefulness survives, and an independent audit against the GDPR.</p>
 
 </div>
 
@@ -17,7 +17,7 @@
 
 ## Overview
 
-Autonomous vehicle perception models need large volumes of labelled road
+Autonomous vehicle perception models need large volumes of labeled road
 footage, and that footage records people. Simulated data avoids recording
 anyone, but the simulator is tuned from real driving statistics, so the privacy
 risk comes back through that channel. **MURAGALA** places formal guarantees
@@ -52,7 +52,7 @@ checks, and nothing is released before an independent audit.
 ## Key Features
 
 ### Privacy Integration
-* **Private Calibration:** The Laplace mechanism privatises seven aggregate driving statistics at ε = 1.8 each, 12.6 in total under sequential composition, before they configure CARLA. The real values never leave the owner's machine.
+* **Private Calibration:** The Laplace mechanism privatizes seven aggregate driving statistics at ε = 1.8 each, 12.6 in total under sequential composition, before they configure CARLA. The real values never leave the owner's machine.
 * **DP-SGD Training:** Opacus 1.4.1 with an RDP accountant, per-sample clipping (C = 1.0), δ = 1e-5 and target budgets of ε 1, 3 and 8, with an automatic halt at ε = 10. A non-private baseline sets the utility ceiling.
 * **Guarantees Tested, Not Assumed:** A shadow-model membership inference attack on confidence and per-sample loss. Under DP the attack AUC falls to about 0.51, chance level.
 * **Signed Evidence:** Every training run writes an audit report signed with HMAC-SHA256, and a joint certificate combines the privacy evidence with the utility results.
@@ -67,10 +67,10 @@ checks, and nothing is released before an independent audit.
 * **Independent Verification:** Signatures, budgets and manifests are re-checked with this component's own code, so a defect in the checked code cannot pass unnoticed.
 * **Attacks on the Calibration Channel:** A reconstruction attack on the published statistics and a composition check on the calibration budget.
 * **Leakage and k-Anonymity:** Released files are scanned for paths, credentials and coordinates, and frame metadata must reach k = 5.
-* **Regulatory Verdict:** Each provision of GDPR Articles 5, 17, 25 and 32 and PDPA sections 5 and 6 is marked verified only when the check behind it passed, with declared weaknesses carried into every report.
+* **Regulatory Verdict:** Each provision of GDPR Articles 5, 17, 25 and 32 is marked verified only when the check behind it passed, with declared weaknesses carried into every report.
 
 ### Dataset Generation
-* **Calibrated Capture:** Five CARLA towns, about 2000 frame sets each, with weather, time of day, traffic density and speed drawn from the privatised statistics.
+* **Calibrated Capture:** Five CARLA towns, about 2000 frame sets each, with weather, time of day, traffic density and speed drawn from the privatized statistics.
 * **Five Outputs per Frame:** RGB, depth, semantic segmentation, a class mask and a YOLO bounding-box label.
 * **Encrypted at Source:** AES-256-CBC with a SHA-256 manifest per town, role-based access control, and the plaintext removed after encryption.
 
@@ -152,7 +152,7 @@ The integrated verdict is in `release/pipeline_report.json`:
 | **FAIL** | The privacy or the compliance verdict failed |
 | **INCOMPLETE** | Anything else, for example no KITTI set yet. Not a failure |
 
-> **Real statistics:** keep the unprivatised calibration file outside the repository. The commit checks refuse it.
+> **Real statistics:** keep the unprivatized calibration file outside the repository. The commit checks refuse it.
 
 ### Running a Component on Its Own
 
@@ -180,7 +180,7 @@ ruff check .
 
 The suites cover decryption and manifest checks, key loading, every handoff contract, the stage graph and gates, Laplace noise and its accounting, DP-SGD budgets and the halt, the attack features, certificate signing and the tamper test, the poisoning detector against injected defects, size-stratified AP, FID sampling, budget audits, the reconstruction attack, composition, leakage patterns and the regulatory mapping. The end-to-end test runs every real stage on an encrypted fixture and expects an overall PASS.
 
-Install the commit checks once per clone. They block `.env` files, keys, unprivatised statistics, datasets, model weights and em or en dashes, and run the linter:
+Install the commit checks once per clone. They block `.env` files, keys, unprivatized statistics, datasets, model weights and em or en dashes, and run the linter:
 
 ```bash
 pip install pre-commit
@@ -205,12 +205,12 @@ The two budgets protect different data, so they are reported separately and neve
 
 | Member | Student ID | Component | Folder |
 |---|---|---|---|
-| S. A. S. D. Priyadarshi | IT22309556 | Privacy Integration, framework integration | `Privacy-Integration/`, `pipeline/` |
+| Priyadarshi S.A.S.D. | IT22309556 | Privacy Integration, framework integration | `Privacy-Integration/`, `pipeline/` |
 | Apeksha M.K.S.R | IT22110220 | Utility Evaluation | `Utility-Evaluation/` |
 | Wijesinghe R.D.P.T. | IT22066916 | Risk and Compliance | `Risk-Compliance/` |
 | Yubitha S. | IT22541284 | Dataset Generation | `Dataset-Generation/` |
 
-BSc (Hons) in Information Technology, specialising in Cyber Security. Sri Lanka Institute of Information Technology. Project R26-CS-010.
+BSc (Hons) in Information Technology, specializing in Cyber Security. Sri Lanka Institute of Information Technology. Project R26-CS-010.
 
 ---
 
