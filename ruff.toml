@@ -1,0 +1,17 @@
+# Lint settings for every component. Run from the repository root: ruff check .
+line-length = 110
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RET", "ARG", "PTH"]
+# Nested conditional expressions read worse than the if/else blocks they replace.
+ignore = ["SIM108"]
+
+[lint.per-file-ignores]
+"**/tests/*" = ["ARG"]
+
+[lint.isort]
+known-first-party = [
+    "privacy_integration", "utility_evaluation", "risk_compliance",
+    "r26_pipeline", "r26_contracts", "scripts", "tests",
+]

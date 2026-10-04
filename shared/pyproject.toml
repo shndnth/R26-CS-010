@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "r26-shared"
+version = "1.0.0"
+description = "Code and handoff contracts shared by every R26-CS-010 component"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.18", "pycryptodome>=3.19"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+include = ["r26_contracts*", "r26_common*"]
+
+[tool.setuptools.package-data]
+r26_contracts = ["schemas/*.schema.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,43 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.8
+    hooks:
+      - id: ruff-check
+
+  - repo: local
+    hooks:
+      - id: no-secret-files
+        name: no .env files or key material
+        entry: these files must never be committed
+        language: fail
+        files: '(^|/)\.env$|(^|/)\.env\.(?!example$)[^/]*$|\.(key|pem|pfx)$|(^|/)(secrets|credentials)\.json$'
+
+      - id: no-unprivatised-data
+        name: no unprivatised calibration statistics
+        entry: real statistics must stay outside the repository
+        language: fail
+        files: '(?i)TRUE_VALUES|(^|/)calibration_source/|_real\.json$|(^|/)waymo_[^/]*\.json$'
+
+      - id: no-data-or-weights
+        name: no datasets, model weights or run outputs
+        entry: datasets, weights and run outputs are not committed
+        language: fail
+        files: '\.(enc|pt|pth|ckpt|onnx|npy|npz)$|(^|/)(handoff_[^/]*|outputs|runs|decrypted_output|yolo_dataset|kitti_dataset)/'
+
+      - id: no-em-or-en-dashes
+        name: no em or en dashes
+        entry: '\xe2\x80[\x93\x94]'
+        language: pygrep
+        types: [text]

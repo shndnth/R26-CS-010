@@ -1,0 +1,122 @@
+# --- Secrets. Never commit. -------------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+secrets.json
+credentials.json
+
+# --- Unprivatised source data -----------------------------------------------
+*TRUE_VALUES*
+*yubitha*
+calibration_source/
+calibration_stats_real.json
+waymo_*.json
+*_real.json
+
+# --- Local pipeline settings and run workspaces --------------------------------
+pipeline/pipeline.yaml
+R26_runs/
+
+# --- Generated handoff packages ---------------------------------------------
+handoff_*/
+delivery_*/
+
+# --- Generated outputs ------------------------------------------------------
+outputs/
+results/
+runs/
+figures/
+logs/
+
+# --- Datasets and model weights ---------------------------------------------
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.pkl
+*.onnx
+*.bin
+*.npy
+*.npz
+*.pcd
+*.las
+*.bag
+*.tfrecord
+
+# CARLA encrypted sensor output
+*.enc
+*.png.enc
+
+# Utility Evaluation working folders
+output/
+decrypted_output/
+poisoning_detection_report/
+ground_truth_extraction/
+label_alignment_report/
+kitti_raw/
+test_poison/
+
+# Imagery
+dataset/
+datasets/
+yolo_dataset/
+kitti_dataset/
+*.png
+*.jpg
+*.jpeg
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Virtual environments ---------------------------------------------------
+venv/
+env/
+.venv/
+.env/
+conda-env/
+research/
+utility/
+compliance/
+dp_av_env/
+r26cs010/
+
+# --- Test and coverage ------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- Jupyter ----------------------------------------------------------------
+.ipynb_checkpoints/
+
+# --- Runtime ----------------------------------------------------------------
+*.log
+*.tmp
+*.bak
+tmp/
+temp/
+
+# CSV is generated data here; force-add a specific file if needed.
+*.csv
+
+# --- Editors and OS ---------------------------------------------------------
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
