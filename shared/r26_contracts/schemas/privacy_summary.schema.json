@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/privacy_summary.schema.json",
+  "title": "Privacy Integration aggregate across seeds (summary.json)",
+  "type": "object",
+  "required": [
+    "generated_at",
+    "configs"
+  ],
+  "properties": {
+    "configs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "n_seeds",
+          "target_epsilon",
+          "utility_auc_mean"
+        ],
+        "properties": {
+          "n_seeds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "target_epsilon": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "utility_auc_mean": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "attack_auc_mean": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

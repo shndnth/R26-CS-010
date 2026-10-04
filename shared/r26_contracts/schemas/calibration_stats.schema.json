@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/calibration_stats.schema.json",
+  "title": "Privatised calibration statistics (Privacy Integration to Dataset Generation)",
+  "type": "object",
+  "required": [
+    "vehicle_density_per_km",
+    "pedestrian_density_per_km",
+    "avg_vehicle_speed_kmh",
+    "avg_pedestrian_speed_kmh",
+    "intersection_count_per_km",
+    "weather_distribution",
+    "time_of_day_distribution",
+    "calibration_epsilon_spent",
+    "num_queries",
+    "generated_at"
+  ],
+  "properties": {
+    "vehicle_density_per_km": {
+      "type": "number"
+    },
+    "pedestrian_density_per_km": {
+      "type": "number"
+    },
+    "avg_vehicle_speed_kmh": {
+      "type": "number"
+    },
+    "avg_pedestrian_speed_kmh": {
+      "type": "number"
+    },
+    "intersection_count_per_km": {
+      "type": "number"
+    },
+    "weather_distribution": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minProperties": 1
+    },
+    "time_of_day_distribution": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minProperties": 1
+    },
+    "calibration_epsilon_spent": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "num_queries": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "calibration_epsilon_per_query": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  },
+  "description": "calibration_epsilon_spent is the total over all queries (sequential composition). Files written before the correction carry the per-query value there and no calibration_epsilon_per_query."
+}

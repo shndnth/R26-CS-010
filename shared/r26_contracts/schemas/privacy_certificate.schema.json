@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/privacy_certificate.schema.json",
+  "title": "Joint privacy certificate",
+  "type": "object",
+  "required": [
+    "configurations",
+    "certification",
+    "pending_sections"
+  ],
+  "properties": {
+    "certification": {
+      "type": "object",
+      "required": [
+        "privacy_enforcement",
+        "empirical_validation",
+        "overall_privacy_verdict"
+      ],
+      "properties": {
+        "privacy_enforcement": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "empirical_validation": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "overall_privacy_verdict": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      }
+    },
+    "utility_assessment": {
+      "type": "object",
+      "required": [
+        "status",
+        "utility_retention_pct"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "supplied",
+            "partially supplied"
+          ]
+        }
+      }
+    }
+  }
+}

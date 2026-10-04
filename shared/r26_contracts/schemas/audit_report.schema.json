@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/audit_report.schema.json",
+  "title": "Per-run audit report; a DP report or an explicit non-private declaration",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "project",
+        "member",
+        "generated_at",
+        "privacy_config",
+        "results"
+      ],
+      "not": {
+        "required": [
+          "differential_privacy_applied"
+        ]
+      },
+      "properties": {
+        "results": {
+          "type": "object",
+          "required": [
+            "final_epsilon",
+            "total_steps",
+            "budget_respected"
+          ],
+          "properties": {
+            "final_epsilon": {
+              "type": "number"
+            },
+            "total_steps": {
+              "type": "integer"
+            },
+            "budget_respected": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "differential_privacy_applied",
+        "config",
+        "seed",
+        "privacy_config"
+      ],
+      "properties": {
+        "differential_privacy_applied": {
+          "const": false
+        },
+        "privacy_config": {
+          "type": "object",
+          "properties": {
+            "epsilon": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

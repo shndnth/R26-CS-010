@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/audit_certificate.schema.json",
+  "title": "HMAC-SHA256 signature over an audit report",
+  "type": "object",
+  "required": [
+    "report_file",
+    "sha256_content",
+    "hmac_signature",
+    "algorithm",
+    "signed_at"
+  ],
+  "properties": {
+    "sha256_content": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "hmac_signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

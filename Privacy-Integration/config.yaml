@@ -1,0 +1,37 @@
+privacy:
+  epsilon_total_max: 10.0          # hard ceiling; the RDP accountant halts training here
+  epsilon_calibration_max: 2.0     # cap on each calibration query; 7 queries spend 7x the per-query value
+  delta: 1.0e-5
+  clipping_norm: 1.0               # per-sample gradient L2 bound (C in DP-SGD)
+  random_seed: 42
+  secure_rng: false                # requires torchcsprng; enable on the Linux production host
+
+ablation:
+  configs:
+    - name: config_a
+      target_epsilon: 1.0
+      epochs: 10
+    - name: config_b
+      target_epsilon: 3.0
+      epochs: 10
+    - name: config_c
+      target_epsilon: 8.0
+      epochs: 10
+
+dataset:
+  batch_size: 32
+  feature_dim: 64                  # legacy tabular pipeline only
+  native_width: 800                # CARLA capture resolution
+  native_height: 600
+  train_width: 448                 # preserves the native 4:3 ratio
+  train_height: 336
+  min_box_area_native: 1024.0      # ~32x32 px; smaller targets are unresolvable after resize
+  train_fraction: 0.70
+  val_fraction: 0.15
+
+attack:
+  n_shadow_models: 1
+  shadow_epochs: 10
+  attack_epochs: 30
+  success_rate_ceiling: 55.0       # 50% is random guessing on a balanced evaluation
+  reid_ceiling: 10.0

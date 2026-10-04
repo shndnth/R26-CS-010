@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/calibration_audit_log.schema.json",
+  "title": "Calibration query audit trail (Privacy Integration to Risk and Compliance)",
+  "type": "object",
+  "required": [
+    "epsilon_calibration",
+    "generated_at",
+    "queries"
+  ],
+  "properties": {
+    "epsilon_calibration": {
+      "type": "number"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "queries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "query",
+          "sensitivity",
+          "noise_added",
+          "epsilon_used"
+        ]
+      }
+    }
+  }
+}

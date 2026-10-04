@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "privacy-integration"
+version = "1.0.0"
+description = "Privacy Integration component for R26-CS-010: epsilon-differential privacy enforcement and empirical membership inference validation for synthetic AV data"
+requires-python = ">=3.11"
+authors = [{ name = "S. A. S. D. Priyadarshi", email = "it22309556@my.sliit.lk" }]
+
+dependencies = [
+    "torch==2.5.1",
+    "torchvision==0.20.1",
+    "opacus==1.4.1",
+    "numpy>=1.24,<3",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "scipy>=1.11",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "pillow>=10.0",
+    "r26-shared",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+pi-calibrate = "scripts.run_calibration:main"
+pi-train = "scripts.run_training:main"
+pi-attack = "scripts.run_mia_study:main"
+pi-decrypt = "scripts.decrypt_dataset:main"
+pi-analyse-labels = "scripts.analyse_labels:main"
+pi-report = "scripts.build_report:main"
+
+[tool.setuptools.packages.find]
+include = ["privacy_integration*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::UserWarning:opacus.*",
+    "ignore::FutureWarning:torch.*",
+]

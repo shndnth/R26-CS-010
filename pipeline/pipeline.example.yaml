@@ -1,0 +1,44 @@
+# Copy to pipeline.yaml (gitignored) and edit. Relative paths are relative to this file.
+
+# Where every run writes its results. Must be outside the repository.
+workspace: ../../R26_runs/main
+
+# repository: ..        # defaults to the folder above pipeline/
+
+inputs:
+  # The encrypted delivery from Dataset Generation (IT22541284): the folder holding town01 to town05.
+  encrypted_dataset: ../../Dataset/output
+  # Unprivatised calibration statistics, kept outside the repository. Empty skips calibration.
+  calibration_source:
+  # KITTI training folder holding image_2 and label_2. Leave empty to skip the real-data baseline.
+  kitti:
+
+towns: [town01, town02, town03, town04, town05]
+
+# A conda environment name or a python path per component.
+environments:
+  privacy:    {conda: research}
+  utility:    {conda: utility}
+  compliance: {conda: compliance}
+  # privacy: {python: C:/Users/<you>/anaconda3/envs/research/python.exe}
+
+privacy:
+  seeds: [42, 43, 44]
+  configs: [no_dp, config_a, config_b, config_c]
+  device:                 # cuda or cpu; empty picks automatically
+  epochs:                 # empty keeps Privacy-Integration/config.yaml
+  shadow_epochs:
+  attack_epochs:
+  calibration_epsilon:    # per query; empty keeps the default (1.8, seven queries total 12.6)
+
+utility:
+  model: yolov8n.pt
+  epochs: 50
+  imgsz: 640
+  batch: 8
+  workers: 8              # 0 if data loading hangs on Windows
+  patience: 15
+  device:                 # 0 for the first GPU, cpu, or empty for automatic
+  split_mode: random      # block keeps neighbouring frames in one split
+  fid_limit: 1000
+  fid_crop: resize        # center-square removes the aspect ratio confound

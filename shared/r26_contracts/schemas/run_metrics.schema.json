@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/run_metrics.schema.json",
+  "title": "Per-run utility metrics (metrics.json)",
+  "type": "object",
+  "required": [
+    "seed",
+    "test_metrics"
+  ],
+  "properties": {
+    "seed": {
+      "type": "integer"
+    },
+    "test_metrics": {
+      "type": "object",
+      "required": [
+        "auc"
+      ],
+      "properties": {
+        "auc": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

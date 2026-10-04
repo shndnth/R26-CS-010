@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/mia_results.schema.json",
+  "title": "Membership inference result for one run",
+  "type": "object",
+  "required": [
+    "config",
+    "seed",
+    "attack_auc",
+    "attack_success_rate_pct",
+    "target_loss_gap",
+    "n_members",
+    "n_nonmembers"
+  ],
+  "properties": {
+    "attack_auc": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "attack_success_rate_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "target_loss_gap": {
+      "type": "number"
+    },
+    "epsilon": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "seed": {
+      "type": "integer"
+    }
+  }
+}

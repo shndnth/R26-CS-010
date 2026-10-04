@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "r26-pipeline"
+version = "1.0.0"
+description = "Runs Privacy Integration, Utility Evaluation and Risk and Compliance as one pipeline"
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6.0", "r26-shared"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6", "pycryptodome>=3.19", "numpy>=1.24", "pillow>=10.0"]
+
+[project.scripts]
+r26 = "r26_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["r26_pipeline*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

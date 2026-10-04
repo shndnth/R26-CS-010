@@ -34,6 +34,11 @@ jobs:
         include:
           - folder: shared
             install: -e "shared[dev]"
+          - folder: pipeline
+            install: -e shared -e "pipeline[dev]"
+          - folder: Privacy-Integration
+            torch: torch==2.5.1 torchvision==0.20.1
+            install: -e shared -e "Privacy-Integration[dev]"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
