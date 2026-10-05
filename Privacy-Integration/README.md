@@ -36,6 +36,7 @@ pi-decrypt        --input-dir  <encrypted> --output-dir <decrypted>
 pi-analyse-labels --data-dir   <decrypted>
 pi-train          --data-dir   <decrypted> --seed 42
 pi-attack         --data-dir   <decrypted> --seed 42
+python -m scripts.run_threshold_attack --data-dir <decrypted>
 pi-report
 ```
 

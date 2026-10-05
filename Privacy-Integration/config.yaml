@@ -4,7 +4,7 @@ privacy:
   delta: 1.0e-5
   clipping_norm: 1.0               # per-sample gradient L2 bound (C in DP-SGD)
   random_seed: 42
-  secure_rng: false                # requires torchcsprng; enable on the Linux production host
+  secure_rng: false                # needs torchcsprng, which does not support PyTorch 2.x
 
 ablation:
   configs:

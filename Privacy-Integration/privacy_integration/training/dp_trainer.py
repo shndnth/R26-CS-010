@@ -67,7 +67,7 @@ class DPTrainingWrapper:
             model = ModuleValidator.fix(model)
 
         self._model = model.to(self._device)
-        # secure_mode off: torchcsprng has no Windows wheel for Python 3.11.
+        # secure_mode off: torchcsprng is unmaintained and only supports PyTorch 1.8.1.
         engine = PrivacyEngine(secure_mode=False)
 
         if noise_multiplier is not None:

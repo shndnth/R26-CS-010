@@ -54,7 +54,7 @@ checks, and nothing is released before an independent audit.
 ### Privacy Integration
 * **Private Calibration:** The Laplace mechanism privatizes seven aggregate driving statistics at ε = 1.8 each, 12.6 in total under sequential composition, before they configure CARLA. The real values never leave the owner's machine.
 * **DP-SGD Training:** Opacus 1.4.1 with an RDP accountant, per-sample clipping (C = 1.0), δ = 1e-5 and target budgets of ε 1, 3 and 8, with an automatic halt at ε = 10. A non-private baseline sets the utility ceiling.
-* **Guarantees Tested, Not Assumed:** A shadow-model membership inference attack on confidence and per-sample loss. Under DP the attack AUC falls to about 0.51, chance level.
+* **Guarantees Tested, Not Assumed:** A shadow-model membership inference attack on confidence and per-sample loss, plus a loss-threshold attack reporting the true-positive rate at 1% and 5% false positives. Under DP both attacks fall to chance level (AUC about 0.50 to 0.51).
 * **Signed Evidence:** Every training run writes an audit report signed with HMAC-SHA256, and a joint certificate combines the privacy evidence with the utility results.
 
 ### Utility Evaluation
@@ -170,7 +170,7 @@ Every command takes `--help`. Each component's README has the full sequence.
 ```bash
 cd shared && pytest                  # 50 tests
 cd pipeline && pytest                # 37 tests
-cd Privacy-Integration && pytest     # 103 tests
+cd Privacy-Integration && pytest     # 107 tests
 cd Utility-Evaluation && pytest      # 117 tests
 cd Risk-Compliance && pytest         # 73 tests
 cd Dataset-Generation && pytest      # 14 tests, CARLA stubbed

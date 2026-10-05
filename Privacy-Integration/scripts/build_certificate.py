@@ -293,8 +293,9 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
                 "severity": "medium",
                 "detail": "DP noise is drawn from a standard pseudo-random generator rather "
                           "than a cryptographically secure one.",
-                "cause": "torchcsprng has no Windows wheel for Python 3.11.",
-                "remediation": "Enable secure_mode on a Linux host for production runs.",
+                "cause": "torchcsprng, which secure_mode needs, is unmaintained and only supports "
+                         "PyTorch 1.8.1, so it cannot run with PyTorch 2.5 on any OS.",
+                "remediation": "Use a secure noise source once one supports current PyTorch.",
             },
             {
                 "issue": "Minority-class oversampling duplicates records",
