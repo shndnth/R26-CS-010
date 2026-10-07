@@ -1,0 +1,144 @@
+/* MURAGALA: Colors, fonts, page basics, smooth scrolling and type. Edit the palette here. */
+
+:root {
+  /* Night drive: a dark road, off-white line work, and three neon signals. */
+  --bg: #0b0c0f;        /* page */
+  --ink: #eceae4;       /* text and line art */
+  --muted: #9b9ca3;     /* secondary text (7:1 on the page) */
+  --rule: #262930;      /* hairlines */
+  --edge-line: #3d4049; /* floating nav outline */
+  --accent: #d2ff00;    /* Lando volt green: protection, primary actions */
+  --hot: #ff8000;       /* papaya: real people, risk */
+  --cool: #2ee6ff;      /* electric cyan: data, sensors */
+  --on-accent: #0b0c0f; /* text on amber */
+
+  --serif: "Instrument Serif", "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* The nav is a floating card: --bar-h tall, --bar-top from the top.
+     --nav-h is the space it takes, which content keeps clear of. */
+  --bar-h: 60px;
+  --bar-top: 14px;
+  --nav-h: calc(var(--bar-h) + var(--bar-top) + 10px);
+  --gutter: clamp(16px, 4vw, 56px);
+  /* Content sits in a centered frame no wider than --max. --edge is the space
+     on each side of it; % resolves against whatever box uses it. */
+  --max: 1360px;
+  --edge: max(var(--gutter), calc((100% - var(--max)) / 2));
+  --sw: 2; /* line width in SVG units, set per drawing by js/line-width.js */
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.static { scroll-behavior: smooth; }
+
+/* Smooth scrolling (Lenis) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+p, h1, h2, h3, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 500;
+}
+.skip:focus { top: 12px; }
+[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+.nowrap { white-space: nowrap; }
+
+/* ---------- Type ---------- */
+
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 4.9vw, 5.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.display--hero { font-size: clamp(2.6rem, 6.4vw, 7rem); line-height: 0.98; }
+.display--sm { font-size: clamp(1.75rem, 3.1vw, 3.25rem); line-height: 1.1; }
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(16px, 3vh, 32px);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eyebrow span {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.eyebrow span::after {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  margin-left: 12px;
+  vertical-align: middle;
+  background: var(--ink);
+}
+
+.lede {
+  max-width: 30ch;
+  margin-top: clamp(16px, 3vh, 28px);
+  font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.caption {
+  max-width: 44ch;
+  margin-top: 16px;
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation: none !important; }
+  html.static { scroll-behavior: auto; }
+}

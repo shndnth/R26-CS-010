@@ -1,0 +1,38 @@
+/* MURAGALA: Line drawings: stroke style and the drawing colors. */
+
+/* ---------- Line art ---------- */
+
+.lineart {
+  overflow: visible;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: var(--sw);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lineart .fill { fill: var(--ink); stroke: none; }
+.lineart .knock { fill: var(--bg); }
+/* Drawing colors, each with one meaning: volt = protection,
+   papaya = real people and risk, cyan = data and sensors. */
+.lineart .accent { stroke: var(--accent); }
+.lineart .accent-fill { fill: var(--accent); stroke: none; }
+.lineart .hot { stroke: var(--hot); }
+.lineart .hot-fill { fill: var(--hot); stroke: none; }
+.lineart .cool { stroke: var(--cool); }
+.lineart .cool-fill { fill: var(--cool); stroke: none; }
+.lineart .hot-text { fill: var(--hot); }
+.lineart .cool-text { fill: var(--cool); }
+.lineart .glow { filter: drop-shadow(0 0 5px rgb(210 255 0 / 0.55)); }
+.lineart .hot.glow { filter: drop-shadow(0 0 5px rgb(255 128 0 / 0.6)); }
+/* Scene details are scaled by --k (set per scene in js/scenes.js); dividing
+   by it keeps every line the same weight on screen. */
+.lineart .orn { stroke-width: calc(var(--sw) / var(--k, 1)); }
+.lineart .thin { stroke-width: calc(var(--sw) * 0.75 / var(--k, 1)); }
+.lineart .dotted { stroke-dasharray: 0.1 calc(var(--sw) * 7 / var(--k, 1)); stroke-width: calc(var(--sw) * 1.4 / var(--k, 1)); }
+.lineart text {
+  fill: var(--ink);
+  stroke: none;
+  font-family: var(--sans);
+  font-weight: 500;
+}
+.lineart .tag-text { fill: var(--bg); }

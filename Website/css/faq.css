@@ -1,0 +1,90 @@
+/* MURAGALA: 08 FAQ: the questions and the scanner. */
+
+/* ---------- FAQ ---------- */
+
+.faq { border-top: 1px solid var(--rule); }
+.accordion { border-top: 1px solid var(--ink); }
+.qa-row { position: relative; }
+/* Each row's divider is its own element so it can draw in from the left. */
+.qa__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--rule);
+  transform-origin: left;
+}
+.qa-row:has(.qa[open]) .qa__rule { background: var(--accent); }
+.qa summary {
+  position: relative;
+  display: block;
+  padding: 26px 56px 26px 0;
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.3vw, 2rem);
+  line-height: 1.2;
+  cursor: pointer;
+  list-style: none;
+}
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::before,
+.qa summary::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 18px;
+  height: 1.5px;
+  background: var(--ink);
+  transition: transform 0.3s ease;
+}
+.qa summary::after { transform: rotate(90deg); }
+.qa[open] summary::after { transform: rotate(0deg); }
+.qa summary { transition: color 0.25s ease, padding-left 0.3s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.qa summary:hover,
+.qa[open] summary { color: var(--accent); padding-left: 12px; }
+.qa summary:hover::before,
+.qa summary:hover::after,
+.qa[open] summary::before,
+.qa[open] summary::after { background: var(--accent); }
+.qa__body { padding: 0 56px 28px 0; }
+.qa__body p { max-width: 60ch; color: var(--muted); font-size: 1.05rem; }
+
+@supports (interpolate-size: allow-keywords) {
+  .qa { interpolate-size: allow-keywords; }
+  .qa::details-content {
+    height: 0;
+    overflow: clip;
+    transition: height 0.35s ease, content-visibility 0.35s allow-discrete;
+  }
+  .qa[open]::details-content { height: auto; }
+}
+
+/* FAQ: intro and scanner on the left, questions on the right. */
+.faq__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: center;
+}
+.faq__intro { display: grid; justify-items: start; gap: clamp(14px, 2.4vh, 24px); }
+.faq .faq__intro .section__title { margin-bottom: 0; }
+.faq__lede { max-width: 30ch; color: var(--muted); font-size: 1.05rem; }
+
+/* A lidar-style scanner: rings, a turning volt sweep, cyan returns. */
+.radar { width: clamp(150px, 26vh, 240px); height: auto; margin-top: 1vh; }
+.radar__cross { stroke: var(--rule); }
+.radar__trail { fill: var(--accent); fill-opacity: 0.14; stroke: none; }
+.radar__sweep { transform-origin: 200px 200px; animation: radar-sweep 4s linear infinite; }
+.radar__blip { opacity: 0; animation: radar-blip 4s linear infinite; }
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
+@keyframes radar-blip {
+  0% { opacity: 1; }
+  45% { opacity: 0.15; }
+  100% { opacity: 0; }
+}
+
+@media (max-width: 899px) {
+  .faq__grid { grid-template-columns: 1fr; }
+  .radar { display: none; }
+}

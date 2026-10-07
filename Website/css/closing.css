@@ -1,0 +1,61 @@
+/* MURAGALA: 09 The closing call: hood, headline and buttons. */
+
+/* ---------- Final call ---------- */
+
+/* The closing call and the footer fit together on one screen. */
+.cta {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+  padding-top: clamp(40px, 7vh, 88px);
+  padding-bottom: clamp(40px, 7vh, 88px);
+  text-align: center;
+}
+.cta .wrap { width: 100%; }
+.cta .display { max-width: 14ch; margin: 0 auto; font-size: clamp(2.4rem, min(5.4vw, 9vh), 6rem); }
+.cta .actions { margin-top: clamp(20px, 3.5vh, 36px); }
+.cta .word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.24em;
+  margin-bottom: -0.24em;
+}
+.cta .word > span { display: inline-block; will-change: transform; }
+.cta__mark {
+  position: relative;
+  color: var(--accent);
+  font-style: italic;
+  --u: 1;
+}
+.cta__mark::after {
+  content: "";
+  position: absolute;
+  left: 0.04em;
+  right: 0.04em;
+  bottom: 0.02em;
+  height: 0.05em;
+  background: var(--accent);
+  transform: scaleX(var(--u));
+  transform-origin: left;
+}
+/* Protective pulses: copies of the hood ripple outward in volt. */
+.hood__pulse {
+  stroke: var(--accent);
+  stroke-width: calc(var(--sw) * 0.75);
+  opacity: 0;
+  transform-origin: 500px 330px;
+  animation: hood-pulse 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.hood__pulse--late { animation-delay: 1.6s; }
+@keyframes hood-pulse {
+  0% { opacity: 0.75; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.22); }
+}
+.hood {
+  display: block;
+  width: min(560px, 78vw, 52vh);
+  height: auto;
+  margin: 0 auto clamp(16px, 3vh, 32px);
+}

@@ -1,0 +1,345 @@
+/* MURAGALA: The story scenes (01 to 06): static layout, pinned layout, hero and chapter bar. */
+
+/* ---------- Scenes: static layout (reduced motion, no script) ---------- */
+
+.deck { position: relative; }
+
+.scene {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  min-height: 80vh;
+  padding: calc(var(--nav-h) + 56px) var(--gutter) 72px;
+  border-bottom: 1px solid var(--rule);
+}
+.scene--hero { min-height: 100vh; }
+.scene__text { max-width: 720px; }
+
+.stage, .scroll-hint { display: none; }
+
+.figure svg { width: 100%; max-width: 520px; height: auto; margin: 0 auto; display: block; }
+.figure:empty { display: none; }
+
+.hero-art { display: flex; justify-content: center; }
+.hero-art picture { display: block; width: 100%; }
+/* The hero image blends into the page with no frame: the image file itself
+   is graded so its blacks are the page color (#0b0c0f), and its outer rim
+   fades to that color. If the page color changes, regrade the image. */
+.hero-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.steps { display: grid; gap: 28px; }
+.step .display { font-size: clamp(2rem, 4.2vw, 4.5rem); }
+
+.stats { display: grid; gap: 32px; }
+.stat__num {
+  font-family: var(--serif);
+  font-size: clamp(3.25rem, 6.6vw, 7.5rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stat .caption { margin-top: 10px; }
+.statement { margin-top: 36px; }
+
+.facts {
+  display: grid;
+  gap: 0;
+  margin-top: clamp(20px, 4vh, 36px);
+}
+.facts li:first-child { border-top: 1px solid var(--rule); }
+.facts li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  color: var(--muted);
+}
+
+.claims { display: grid; gap: 6px; }
+.claims .display { font-size: clamp(2rem, 4vw, 4.25rem); }
+.legal__note { margin-top: clamp(20px, 3.5vh, 32px); }
+
+.process { display: grid; gap: clamp(14px, 2.4vh, 24px); counter-reset: none; }
+.process li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 18px;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.75rem);
+  line-height: 1.12;
+}
+.process__n {
+  display: inline-grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  transform: translateY(-0.35em);
+}
+
+@media (max-width: 799px) {
+  .scene { grid-template-columns: 1fr; min-height: 0; }
+  .scene--hero { min-height: 0; }
+  .figure svg { max-width: 420px; }
+}
+
+/* ---------- Scenes: pinned presentation ---------- */
+
+.motion .deck {
+  --pager: 64px;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.motion .scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+}
+/* The text block spans the same height as the drawing and is centered in it,
+   so words and drawing share one middle line in every scene. */
+.motion .scene__text {
+  position: absolute;
+  left: var(--edge);
+  top: calc(var(--nav-h) + 3vh);
+  bottom: calc(4vh + var(--pager));
+  width: min(calc((100% - 2 * var(--edge)) * 0.46), 660px);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.motion .scene--hero { pointer-events: auto; }
+.motion .scene--hero .scene__text {
+  bottom: max(56px, 7vh);
+  width: min(calc((100% - 2 * var(--edge)) * 0.48), 760px);
+}
+
+.motion .figure { display: none; }
+
+/* Chapter pager (motion only): where you are, how far through, and a way out. */
+.pager { display: none; }
+.motion .pager {
+  position: absolute;
+  left: var(--edge);
+  right: var(--edge);
+  bottom: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  visibility: hidden;
+  opacity: 0;
+}
+.pager ol { display: flex; flex: 1; gap: 10px; min-width: 0; }
+.pager li { flex: 1; max-width: 170px; min-width: 0; }
+.pager li a {
+  display: grid;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.pager li a:hover,
+.pager li a.is-active { color: var(--ink); }
+.pager__label { display: flex; gap: 8px; overflow: hidden; white-space: nowrap; }
+.pager__n { font-variant-numeric: tabular-nums; }
+.pager__bar { display: block; height: 1px; overflow: hidden; background: var(--rule); }
+.pager__bar i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.pager__skip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.pager__skip:hover { background: var(--ink); color: var(--bg); }
+.pager__skip svg { width: 10px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.pager__skip-short { display: none; }
+
+.motion .stage,
+.motion .hero-art {
+  position: absolute;
+  top: calc(var(--nav-h) + 3vh);
+  right: var(--edge);
+  /* Explicit size: an absolutely positioned <svg> ignores top + bottom
+     and would take its height from its width, overflowing wide screens. */
+  width: calc((100% - 2 * var(--edge)) * 0.5);
+  height: calc(100% - var(--nav-h) - 7vh - var(--pager));
+}
+.motion .stage { display: block; z-index: 0; }
+.motion .scene { z-index: 1; }
+.motion .hero-art { display: flex; align-items: center; justify-content: center; }
+/* The opening screen has no pager, so the image uses the full height under the
+   nav, a little over half the frame's width, up to the frame's right edge. */
+.motion .hero-art {
+  /* Same top and bottom as the headline's box, so the two share a middle. */
+  top: calc(var(--nav-h) + 3vh);
+  height: calc(100% - var(--nav-h) - 3vh - max(56px, 7vh));
+  width: calc((100% - 2 * var(--edge)) * 0.56);
+}
+.motion .hero-art picture { width: 100%; height: 100%; }
+/* Revealed top to bottom on load (--r goes 0 to 1, see js/readouts.js). */
+.motion .hero-photo {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  /* Show the whole picture: cropping would cut off its faded rim. */
+  object-fit: contain;
+  /* On load it is revealed top to bottom (--r goes 0 to 1). */
+  --r: 0;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--r) * 112% - 12%), transparent calc(var(--r) * 112%));
+  mask-image: linear-gradient(to bottom, #000 calc(var(--r) * 112% - 12%), transparent calc(var(--r) * 112%));
+}
+
+.motion .scroll-hint {
+  position: absolute;
+  left: var(--edge);
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.motion .scroll-hint span {
+  position: relative;
+  width: 40px;
+  height: 1px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.motion .scroll-hint span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  animation: hint 2.4s ease-in-out infinite;
+}
+@keyframes hint {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+/* Everything outside the hero waits for its scroll stop. */
+.motion .scene:not(.scene--hero) .eyebrow,
+.motion .step,
+.motion .stat,
+.motion .statement,
+.motion .quality__lead,
+.motion .facts li,
+.motion .claims li,
+.motion .legal__note,
+.motion .process { opacity: 0; }
+
+.motion .steps,
+.motion .stats { display: grid; }
+
+/* Animated text gets its own layer so crossfades never repaint the page. */
+.motion .scene__text > *,
+.motion .step,
+.motion .stat,
+.motion .facts li,
+.motion .claims li,
+.motion .hero-art { will-change: transform, opacity; }
+.motion .step,
+.motion .stat { grid-area: 1 / 1; }
+.motion .process li { color: var(--muted); }
+
+@media (max-width: 799px) {
+  .motion .scene__text,
+  .motion .scene--hero .scene__text {
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+    top: var(--nav-h);
+    bottom: 47%;
+    padding: 16px 0 0;
+  }
+  .motion .stage,
+  .motion .hero-art {
+    top: auto;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(1.5vh + var(--pager));
+    width: calc(100% - 2 * var(--gutter));
+    height: 40%;
+  }
+  .motion .hero-art { bottom: 3vh; height: 44%; width: calc(100% - 2 * var(--gutter)); }
+  .motion .scene--hero .scene__text { bottom: 47%; }
+  .motion .scroll-hint { display: none; }
+  .motion .deck { --pager: 52px; }
+  .motion .pager { bottom: 10px; gap: 12px; }
+  .pager ol { gap: 6px; }
+  .pager__t, .pager__skip-long { display: none; }
+  .pager__skip-short { display: inline; }
+  .pager__skip { padding: 8px 14px; }
+  .motion .scene:not(.scene--hero) .scene__text { justify-content: flex-start; padding-top: 4vh; }
+  .motion .display--hero { font-size: clamp(2.3rem, 10.5vw, 3.6rem); }
+  .motion .step .display { font-size: clamp(1.9rem, 8.4vw, 3rem); }
+  .motion .claims .display { font-size: clamp(1.75rem, 7.6vw, 2.8rem); }
+  .motion .display--sm { font-size: clamp(1.4rem, 6vw, 2.2rem); }
+  .motion .stat__num { font-size: clamp(2.6rem, 12.5vw, 4.4rem); }
+  .motion .statement { margin-top: 20px; }
+  .motion .stats { gap: 0; }
+  .motion .lede { margin-top: 12px; }
+  .motion .actions { margin-top: 20px; }
+  .motion .caption { margin-top: 10px; font-size: 0.92rem; }
+  .motion .facts { margin-top: 14px; }
+  .motion .facts li { padding: 6px 0; font-size: 0.9rem; }
+  .motion .process li { font-size: clamp(1.3rem, 5.6vw, 1.8rem); gap: 14px; }
+  .motion .process { gap: 12px; }
+  .motion .eyebrow { margin-bottom: 12px; }
+}
+
+/* Phones held sideways and very short windows */
+@media (min-width: 800px) and (max-height: 520px) {
+  :root { --bar-h: 52px; --bar-top: 8px; }
+  .motion .display--hero { font-size: clamp(1.8rem, 4.6vw, 3rem); }
+  .motion .step .display,
+  .motion .claims .display { font-size: clamp(1.5rem, 3.4vw, 2.4rem); }
+  .motion .display--sm { font-size: clamp(1.2rem, 2.6vw, 1.8rem); }
+  .motion .stat__num { font-size: clamp(2rem, 5vw, 3.4rem); }
+  .motion .process li { font-size: clamp(1.1rem, 2.4vw, 1.6rem); }
+  .motion .caption, .motion .lede { margin-top: 8px; font-size: 0.9rem; }
+  .motion .actions { margin-top: 16px; }
+  .motion .facts li { padding: 4px 0; font-size: 0.85rem; }
+  .motion .eyebrow { margin-bottom: 8px; }
+  .motion .scroll-hint { display: none; }
+}
+
+/* Short laptop screens */
+@media (min-width: 800px) and (max-height: 720px) {
+  .motion .step .display { font-size: clamp(2rem, 3.8vw, 3.6rem); }
+  .motion .stat__num { font-size: clamp(3rem, 5.6vw, 5.5rem); }
+  .motion .facts li { padding: 6px 0; }
+}

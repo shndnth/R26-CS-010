@@ -1,0 +1,83 @@
+/* MURAGALA: Desktop: 07, 08, 09 and the footer as one-screen slides in the pinned deck. */
+
+/* ---------- Slides: Packages, FAQ, closing call, footer ---------- */
+
+/* On desktop these join the pinned deck as slides (js/slides.js moves them in and
+   adds .slides), so moving between them is the same in-place crossfade as the
+   story. Inactive slides stay readable to screen readers but can't be clicked. */
+.slides .deck > .section,
+.slides .deck > .footer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- One screen each: Packages, FAQ, closing call ---------- */
+
+/* On desktop each of these fills exactly one screen: the nav floats over the
+   top padding and the content is centered in the rest. Spacing scales with
+   the screen height so everything fits. Phones keep their natural height. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .packages,
+  .faq,
+  .cta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + 2vh);
+    padding-bottom: 4vh;
+    scroll-margin-top: 0;
+  }
+  .packages > .wrap,
+  .faq > .wrap { width: 100%; }
+  .packages .eyebrow,
+  .faq .eyebrow { margin-bottom: clamp(10px, 1.6vh, 20px); }
+  .packages .section__title,
+  .faq .section__title {
+    max-width: 24ch;
+    margin-bottom: clamp(20px, 4vh, 44px);
+    font-size: clamp(2.2rem, min(3.6vw, 6.4vh), 4rem);
+  }
+  .packages .card { padding: clamp(18px, 3vh, 34px) clamp(22px, 2.2vw, 34px); }
+  .packages .card__name { font-size: 12px; }
+  .packages .card__price { margin-top: clamp(8px, 1.4vh, 16px); font-size: clamp(2rem, 5vh, 3.2rem); }
+  .packages .card__terms { margin-top: 4px; }
+  .packages .card__summary { margin-top: clamp(6px, 1.2vh, 12px); padding-bottom: clamp(10px, 1.8vh, 18px); font-size: 15px; }
+  .packages .card__list { gap: clamp(4px, 1vh, 10px); margin: clamp(10px, 2vh, 20px) 0 clamp(14px, 2.6vh, 26px); }
+  .packages .card__list li { font-size: 14.5px; line-height: 1.45; }
+  .packages .btn { min-height: clamp(40px, 5.2vh, 48px); }
+  .faq .qa summary { padding-top: clamp(14px, 2.6vh, 26px); padding-bottom: clamp(14px, 2.6vh, 26px); }
+  .cta { min-height: 100vh; min-height: 100svh; }
+
+  /* The footer card fills the last screen below the nav. Spacing and the
+     big name scale with the screen height so the whole card stays in view. */
+  .footer {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + 1vh);
+  }
+  .footer__card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding-top: clamp(22px, 4.5vh, 56px);
+  }
+  .footer__top { gap: clamp(20px, 3vh, 40px) 32px; }
+  .footer__brand { gap: clamp(10px, 1.8vh, 18px); }
+  .footer .brand img { height: clamp(36px, 5vh, 48px); }
+  .footer__head { margin-bottom: clamp(8px, 1.6vh, 16px); }
+  .footer__col ul { gap: clamp(4px, 1vh, 10px); }
+  .ticker { margin-top: clamp(16px, 3.5vh, 56px); padding: clamp(10px, 1.6vh, 16px) 0; }
+  .footer__word {
+    flex: 1;
+    align-items: center;
+    margin: clamp(10px, 2vh, 32px) 0;
+    font-size: min(21.5cqi, 24vh);
+  }
+  .footer__bottom { padding-top: clamp(10px, 1.8vh, 18px); }
+}

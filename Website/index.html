@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MURAGALA | Privacy-safe synthetic data for autonomous driving</title>
+  <meta name="description" content="Privacy-safe synthetic driving data and private model training for autonomous vehicle teams. Attack-tested, quality-checked and delivered with a signed privacy certificate.">
+  <meta name="theme-color" content="#0b0c0f">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MURAGALA">
+  <meta property="og:title" content="MURAGALA | Driving data that protects the people in it">
+  <meta property="og:description" content="Privacy-safe synthetic driving data and private model training for autonomous vehicle teams. Attack-tested, quality-checked and delivered with a signed privacy certificate.">
+  <meta property="og:url" content="https://shndnth.github.io/R26-CS-010/">
+  <meta property="og:image" content="https://shndnth.github.io/R26-CS-010/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The MURAGALA logo, a one-line drawing of a guardstone figure under a cobra hood">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- The hero image is the first thing seen: start loading it right away. -->
+  <link rel="preload" as="image" type="image/webp" imagesrcset="assets/lidar-avenue-blend-800.webp 800w, assets/lidar-avenue-blend-1200.webp 1200w, assets/lidar-avenue-blend-1536.webp 1536w" imagesizes="(max-width: 799px) 92vw, 56vw" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap"></noscript>
+  <!-- Styles, one file per part of the page (see css/). Order matters.
+       The ?v= tag makes browsers fetch fresh copies: change it whenever a file changes. -->
+  <link rel="stylesheet" href="css/base.css?v=20261007-8">
+  <link rel="stylesheet" href="css/buttons.css?v=20261007-8">
+  <link rel="stylesheet" href="css/nav.css?v=20261007-8">
+  <link rel="stylesheet" href="css/lineart.css?v=20261007-8">
+  <link rel="stylesheet" href="css/scenes.css?v=20261007-8">
+  <link rel="stylesheet" href="css/packages.css?v=20261007-8">
+  <link rel="stylesheet" href="css/faq.css?v=20261007-8">
+  <link rel="stylesheet" href="css/closing.css?v=20261007-8">
+  <link rel="stylesheet" href="css/footer.css?v=20261007-8">
+  <link rel="stylesheet" href="css/slides.css?v=20261007-8">
+
+  <script>
+    // Always start a fresh load at the top: restoring the old scroll position
+    // before the pinned story is laid out would land mid-page.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    // If setup crashed on the last load, this load uses the plain layout once
+    // (see js/main.js); the next refresh tries the full version again.
+    var forceStatic = false;
+    try {
+      forceStatic = sessionStorage.getItem('muragala-static') === '1';
+      sessionStorage.removeItem('muragala-static');
+    } catch (e) {}
+    window.MURAGALA_FORCE_STATIC = forceStatic;
+    // Pick the layout before first paint: pinned scenes, or plain sections for reduced motion.
+    document.documentElement.classList.add(
+      forceStatic || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'static' : 'motion'
+    );
+    // Safety net: if the page scripts fail to load, show the plain readable
+    // layout instead of scenes that are waiting to be animated in.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!(window.MURAGALA && window.MURAGALA.started)) {
+        document.documentElement.classList.remove('motion');
+        document.documentElement.classList.add('static');
+      }
+    });
+  </script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
+  <!-- The page scripts (see js/main.js). Order matters: each file uses the ones above it. -->
+  <script defer src="js/dom.js?v=20261007-8"></script>
+  <script defer src="js/nav.js?v=20261007-8"></script>
+  <script defer src="js/line-width.js?v=20261007-8"></script>
+  <script defer src="js/geometry.js?v=20261007-8"></script>
+  <script defer src="js/shapes.js?v=20261007-8"></script>
+  <script defer src="js/line.js?v=20261007-8"></script>
+  <script defer src="js/scenes.js?v=20261007-8"></script>
+  <script defer src="js/readouts.js?v=20261007-8"></script>
+  <script defer src="js/theme.js?v=20261007-8"></script>
+  <script defer src="js/pager.js?v=20261007-8"></script>
+  <script defer src="js/timeline.js?v=20261007-8"></script>
+  <script defer src="js/stills.js?v=20261007-8"></script>
+  <script defer src="js/smooth-scroll.js?v=20261007-8"></script>
+  <script defer src="js/closing.js?v=20261007-8"></script>
+  <script defer src="js/slides.js?v=20261007-8"></script>
+  <script defer src="js/life.js?v=20261007-8"></script>
+  <script defer src="js/links.js?v=20261007-8"></script>
+  <script defer src="js/main.js?v=20261007-8"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="#top" aria-label="MURAGALA, back to top">
+        <img src="assets/muragala-mark.png" alt="" width="83" height="156">
+        <span>MURAGALA</span>
+      </a>
+      <nav class="nav__menu" aria-label="Main">
+        <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+          <span class="nav__toggle-label">Menu</span>
+          <span class="nav__toggle-icon" aria-hidden="true"></span>
+        </button>
+        <ul class="nav__links" id="nav-links">
+          <li><a href="#product">Product</a></li>
+          <li><a href="#packages">Packages</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li class="nav__menu-cta"><a href="mailto:contact-us@muragala.lk?subject=MURAGALA%20sample%20request">Request a sample</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--solid btn--sm nav__cta" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20sample%20request">Request a sample</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="deck">
+      <!-- The single line. Shapes and ornaments are built by js/shapes.js and js/scenes.js. -->
+      <svg class="stage lineart" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+        <path class="line" pathLength="1" d="M0 0"/>
+      </svg>
+
+      <!-- 1. Hero -->
+      <section class="scene scene--hero" id="top" data-scene="hero" aria-labelledby="hero-title">
+        <div class="scene__text">
+          <h1 class="display display--hero" id="hero-title">Driving data that protects the people in it.</h1>
+          <p class="lede">Privacy-safe synthetic data and private model training for autonomous driving teams.</p>
+          <div class="actions">
+            <a class="btn" href="#packages">See packages</a>
+            <a class="btn btn--solid" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20sample%20request">Request a sample</a>
+          </div>
+        </div>
+        <div class="hero-art">
+          <picture>
+            <source type="image/webp" srcset="assets/lidar-avenue-blend-800.webp 800w, assets/lidar-avenue-blend-1200.webp 1200w, assets/lidar-avenue-blend-1536.webp 1536w" sizes="(max-width: 799px) 92vw, 56vw">
+            <img class="hero-photo" src="assets/lidar-avenue-blend-1536.jpg" width="1536" height="1024" fetchpriority="high"
+                 alt="A city avenue drawn as a LiDAR point cloud: pedestrians in orange on the sidewalks, cars outlined in cyan, and green scan rings around the car in front">
+          </picture>
+        </div>
+        <p class="scroll-hint" aria-hidden="true"><span></span>Scroll</p>
+      </section>
+
+      <!-- 2. The problem -->
+      <section class="scene" id="problem" data-scene="problem" aria-labelledby="problem-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="problem-title"><span>01</span>The problem</h2>
+          <div class="steps">
+            <div class="step"><p class="display">Real road footage records faces, plates and daily routes.</p></div>
+            <div class="step"><p class="display">Privacy law makes that data slow to collect, reuse and share.</p></div>
+            <div class="step"><p class="display">And trained models can leak the data they learned from.</p></div>
+          </div>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+
+      <!-- 3. What you get -->
+      <section class="scene" id="product" data-scene="product" aria-labelledby="product-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="product-title"><span>02</span>What you get</h2>
+          <div class="steps">
+            <div class="step">
+              <p class="display">Labeled driving data, at the scale you need.</p>
+              <p class="caption">Generated in high-fidelity simulation from the scenarios you choose. No real person appears in any frame.</p>
+            </div>
+            <div class="step">
+              <p class="display">Every label your perception stack needs.</p>
+              <p class="caption">RGB images, depth, semantic segmentation, class masks and bounding boxes, in standard formats your pipeline already reads.</p>
+            </div>
+            <div class="step">
+              <p class="display">Your roads. Your weather. Your hours.</p>
+              <p class="caption">Choose environments, traffic, weather and time of day, and add new scenarios as your program grows.</p>
+            </div>
+            <div class="step">
+              <p class="display">Encrypted and verifiable, file by file.</p>
+              <p class="caption">Strong encryption in transit and at rest, plus a checksum for every file, so you can prove nothing was changed.</p>
+            </div>
+          </div>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+
+      <!-- 4. Privacy you can prove -->
+      <section class="scene" id="privacy" data-scene="privacy" aria-labelledby="privacy-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="privacy-title"><span>03</span>Privacy you can prove</h2>
+          <div class="stats">
+            <div class="stat stat--a">
+              <p class="stat__num">Exposed.</p>
+              <p class="caption">Without protection, an attacker can tell which records a model was trained on.</p>
+            </div>
+            <div class="stat stat--b">
+              <p class="stat__num">Guesswork.</p>
+              <p class="caption">Against models trained with MURAGALA protection, the same attack is close to guessing.</p>
+            </div>
+          </div>
+          <div class="statement">
+            <p class="display display--sm">Every model gets its own attack test.</p>
+            <p class="caption">Differential privacy protects the statistics behind every scenario, and private training runs under a hard privacy budget that you set.</p>
+          </div>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+
+      <!-- 5. Quality you can check -->
+      <section class="scene" id="quality" data-scene="quality" aria-labelledby="quality-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="quality-title"><span>04</span>Quality you can check</h2>
+          <p class="display display--sm quality__lead">Every delivery ships with a quality report and a data poisoning audit, so you see how the data performs on images from real roads before you train on it.</p>
+          <ul class="facts">
+            <li>Detection benchmarks on real-world images</li>
+            <li>Image realism scores</li>
+            <li>Faulty and poisoned labels screened out</li>
+          </ul>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+
+      <!-- 6. Ready for your legal team -->
+      <section class="scene" id="legal" data-scene="legal" aria-labelledby="legal-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="legal-title"><span>05</span>Ready for your legal team</h2>
+          <ul class="claims">
+            <li class="display">Signed privacy certificate.</li>
+            <li class="display">Full audit trail.</li>
+            <li class="display">Controls mapped to data protection law.</li>
+          </ul>
+          <p class="caption legal__note">Starting with GDPR. Each certificate also lists its own limitations, so your team knows exactly what it covers.</p>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+
+      <!-- 7. How it works -->
+      <section class="scene" id="how" data-scene="how" aria-labelledby="how-title">
+        <div class="scene__text">
+          <h2 class="eyebrow" id="how-title"><span>06</span>How it works</h2>
+          <ol class="process">
+            <li><span class="process__n" aria-hidden="true">1</span><span>Tell us what your models need to see.</span></li>
+            <li><span class="process__n" aria-hidden="true">2</span><span>We generate the data and protect it.</span></li>
+            <li><span class="process__n" aria-hidden="true">3</span><span>We test every delivery for privacy and quality.</span></li>
+            <li><span class="process__n" aria-hidden="true">4</span><span>You receive the data, its reports and a signed certificate.</span></li>
+          </ol>
+        </div>
+        <div class="figure" aria-hidden="true"></div>
+      </section>
+      <!-- Chapter pager: where you are in the story, and a way to skip ahead. -->
+      <nav class="pager" aria-label="Chapters">
+        <ol>
+          <li><a href="#problem"><span class="pager__label"><span class="pager__n">01</span><span class="pager__t">Problem</span></span><span class="pager__bar"><i></i></span></a></li>
+          <li><a href="#product"><span class="pager__label"><span class="pager__n">02</span><span class="pager__t">Product</span></span><span class="pager__bar"><i></i></span></a></li>
+          <li><a href="#privacy"><span class="pager__label"><span class="pager__n">03</span><span class="pager__t">Privacy</span></span><span class="pager__bar"><i></i></span></a></li>
+          <li><a href="#quality"><span class="pager__label"><span class="pager__n">04</span><span class="pager__t">Quality</span></span><span class="pager__bar"><i></i></span></a></li>
+          <li><a href="#legal"><span class="pager__label"><span class="pager__n">05</span><span class="pager__t">Legal</span></span><span class="pager__bar"><i></i></span></a></li>
+          <li><a href="#how"><span class="pager__label"><span class="pager__n">06</span><span class="pager__t">How it works</span></span><span class="pager__bar"><i></i></span></a></li>
+        </ol>
+        <a class="pager__skip" href="#packages"><span class="pager__skip-long">Skip to packages</span><span class="pager__skip-short">Skip</span> <svg viewBox="0 0 12 16" aria-hidden="true" focusable="false"><path d="M6 1v14M1 10l5 5 5-5"/></svg></a>
+      </nav>
+    </div>
+
+    <!-- 8. Packages -->
+    <section class="section packages" id="packages" aria-labelledby="packages-title">
+      <div class="wrap">
+        <p class="eyebrow"><span>07</span>Packages</p>
+        <h2 class="display section__title" id="packages-title">Start with the data. Add proof as you grow.</h2>
+        <div class="cards">
+          <article class="card" aria-labelledby="pkg-starter">
+            <h3 class="card__name" id="pkg-starter">Starter</h3>
+            <p class="card__price">From $1,500</p>
+            <p class="card__terms">Per dataset</p>
+            <p class="card__summary">A ready-to-train dataset from our scenario library.</p>
+            <ul class="card__list">
+              <li>Standard driving scenarios, ready to download</li>
+              <li>All label types, in standard formats</li>
+              <li>Encrypted delivery with per-file checksums</li>
+              <li>Quality report</li>
+            </ul>
+            <a class="btn btn--block" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20Starter%20package">Choose Starter</a>
+          </article>
+
+          <article class="card card--featured" aria-labelledby="pkg-pro">
+            <p class="card__badge">Most popular</p>
+            <h3 class="card__name" id="pkg-pro">Pro</h3>
+            <p class="card__price">From $6,000</p>
+            <p class="card__terms">Per dataset and model</p>
+            <p class="card__summary">Everything in Starter, plus:</p>
+            <ul class="card__list">
+              <li>Custom scenarios built to your brief</li>
+              <li>Private model training with a privacy budget you set</li>
+              <li>Attack testing on your model</li>
+              <li>A signed privacy certificate</li>
+            </ul>
+            <a class="btn btn--solid btn--block" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20Pro%20package">Choose Pro</a>
+          </article>
+
+          <article class="card" aria-labelledby="pkg-enterprise">
+            <h3 class="card__name" id="pkg-enterprise">Enterprise</h3>
+            <p class="card__price card__price--text">Contact us</p>
+            <p class="card__terms">Scoped to your program</p>
+            <p class="card__summary">For teams that need it in-house and ongoing.</p>
+            <ul class="card__list">
+              <li>Ongoing data generation as your program grows</li>
+              <li>On-premise or private-cloud deployment</li>
+              <li>Custom privacy budgets and policies</li>
+              <li>Independent verification report</li>
+              <li>Controls mapped to the regulations you work under</li>
+            </ul>
+            <a class="btn btn--block" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20Enterprise">Talk to us</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. FAQ -->
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <div class="wrap faq__grid">
+        <div class="faq__intro">
+          <p class="eyebrow"><span>08</span>FAQ</p>
+          <h2 class="display section__title" id="faq-title">Straight answers.</h2>
+          <p class="faq__lede">What teams ask before they train on synthetic data.</p>
+          <a class="btn btn--sm" href="mailto:contact-us@muragala.lk?subject=A%20question%20about%20MURAGALA">Ask a question</a>
+          <svg class="radar lineart" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+            <circle class="radar__ring thin" cx="200" cy="200" r="60" pathLength="1"/>
+            <circle class="radar__ring thin" cx="200" cy="200" r="120" pathLength="1"/>
+            <circle class="radar__ring" cx="200" cy="200" r="180" pathLength="1"/>
+            <path class="radar__cross" d="M200 30V370M30 200H370"/>
+            <g class="radar__sweep">
+              <path class="radar__trail" d="M200 200L110.0 44.1A180 180 0 0 1 200 20Z"/>
+              <path class="accent" d="M200 200V20"/>
+            </g>
+            <circle class="radar__blip cool-fill" cx="230.8" cy="115.4" r="6" style="animation-delay:0.22s"/>
+            <circle class="radar__blip cool-fill" cx="344.9" cy="161.2" r="6" style="animation-delay:0.83s"/>
+            <circle class="radar__blip cool-fill" cx="239.9" cy="247.5" r="6" style="animation-delay:1.56s"/>
+            <circle class="radar__blip cool-fill" cx="154.9" cy="324.0" r="6" style="animation-delay:2.22s"/>
+            <circle class="radar__blip cool-fill" cx="97.0" cy="214.5" r="6" style="animation-delay:2.91s"/>
+            <circle class="radar__blip cool-fill" cx="92.9" cy="81.1" r="6" style="animation-delay:3.53s"/>
+            <circle class="accent-fill" cx="200" cy="200" r="5"/>
+          </svg>
+        </div>
+        <div class="accordion">
+          <div class="qa-row">
+            <details class="qa">
+            <summary>Is any real person in the data?</summary>
+            <div class="qa__body"><p>No. Every frame is generated in simulation. The real-world statistics used to tune scenarios are protected with differential privacy first.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+          <div class="qa-row">
+            <details class="qa">
+            <summary>Can synthetic data replace real data?</summary>
+            <div class="qa__body"><p>Not fully. It reduces how much real data you need to collect and handle. Every delivery includes a quality report, so you can see how it performs on real-world images.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+          <div class="qa-row">
+            <details class="qa">
+            <summary>Can you build the scenarios we need?</summary>
+            <div class="qa__body"><p>Yes. Pro and Enterprise include custom environments, traffic, weather and time of day, and we add scenarios as your needs change.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+          <div class="qa-row">
+            <details class="qa">
+            <summary>Will it work with our training pipeline?</summary>
+            <div class="qa__body"><p>Data comes in standard image and label formats. Private training works with PyTorch models.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+          <div class="qa-row">
+            <details class="qa">
+            <summary>Can we run it on our own infrastructure?</summary>
+            <div class="qa__body"><p>Yes. Enterprise includes on-premise or private-cloud deployment, so data never leaves your environment.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+          <div class="qa-row">
+            <details class="qa">
+            <summary>How is privacy measured?</summary>
+            <div class="qa__body"><p>With a privacy budget (&epsilon;) that you set, and by attacking every trained model to check that it does not reveal its training data. Results go into your signed certificate.</p></div>
+          </details>
+            <span class="qa__rule" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Final call to action -->
+    <section class="section cta" id="contact" aria-labelledby="cta-title">
+      <div class="wrap">
+        <svg class="hood lineart" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+          <path id="hood-line" class="hood__line" pathLength="1" d="M32.6 322L33.4 322L34.1 322.1L34.9 322.2L35.7 322.4L36.5 322.7L37.3 323.1L38.1 323.6L38.9 324.1L39.6 324.7L40.2 325.4L40.9 326.2L41.4 327.1L41.9 328L42.3 329L42.6 330L42.9 331.1L43 332.2L43.1 333.4L43 334.5L42.8 335.7L42.6 336.9L42.2 338.1L41.7 339.3L41.1 340.4L40.4 341.5L39.5 342.6L38.6 343.6L37.6 344.5L36.4 345.3L35.2 346.1L33.9 346.7L32.6 347.3L31.1 347.7L29.6 348L28.1 348.2L26.5 348.3L24.9 348.2L23.3 348L21.7 347.6L20.1 347.1L18.6 346.5L17 345.7L15.6 344.7L14.2 343.7L12.9 342.5L11.6 341.1L10.5 339.7L9.5 338.1L8.6 336.5L7.9 334.7L7.3 332.9L6.8 331L6.6 329L6.4 327L6.5 325L6.7 323L7.1 320.9L7.7 318.9L8.5 317L9.4 315L10.5 313.2L11.8 311.4L13.2 309.7L14.8 308.2L16.6 306.7L18.4 305.4L20.4 304.3L22.5 303.3L24.7 302.5L27 301.9L29.4 301.4L31.8 301.2L34.3 301.2L36.7 301.3L39.2 301.7L41.6 302.3L44 303.2L46.4 304.2L48.7 305.4L50.8 306.8L52.9 308.5L54.9 310.3L56.7 312.3L58.3 314.4L59.8 316.8L61 319.2L62.1 321.8L63 324.4L63.6 327.2L64 330C46.8 246.9 129.4 252.3 150 196C170.6 236.3 253.2 232.5 236 292C218.6 177.9 301.1 185.3 322 108C342.9 166 427.4 160.4 410 246C392 109.6 478.4 118.4 500 26C521.6 118.4 608 109.6 590 246C572.6 160.4 657.1 166 678 108C698.9 185.3 781.4 177.9 764 292C746.8 232.5 829.4 236.3 850 196C870.6 252.3 953.2 246.9 936 330L936 330L936.4 327.2L937 324.4L937.9 321.8L939 319.2L940.2 316.8L941.7 314.4L943.3 312.3L945.1 310.3L947.1 308.5L949.2 306.8L951.3 305.4L953.6 304.2L956 303.2L958.4 302.3L960.8 301.7L963.3 301.3L965.7 301.2L968.2 301.2L970.6 301.4L973 301.9L975.3 302.5L977.5 303.3L979.6 304.3L981.6 305.4L983.4 306.7L985.2 308.2L986.8 309.7L988.2 311.4L989.5 313.2L990.6 315L991.5 317L992.3 318.9L992.9 320.9L993.3 323L993.5 325L993.6 327L993.4 329L993.2 331L992.7 332.9L992.1 334.7L991.4 336.5L990.5 338.1L989.5 339.7L988.4 341.1L987.1 342.5L985.8 343.7L984.4 344.7L983 345.7L981.4 346.5L979.9 347.1L978.3 347.6L976.7 348L975.1 348.2L973.5 348.3L971.9 348.2L970.4 348L968.9 347.7L967.4 347.3L966.1 346.7L964.8 346.1L963.6 345.3L962.4 344.5L961.4 343.6L960.5 342.6L959.6 341.5L958.9 340.4L958.3 339.3L957.8 338.1L957.4 336.9L957.2 335.7L957 334.5L956.9 333.4L957 332.2L957.1 331.1L957.4 330L957.7 329L958.1 328L958.6 327.1L959.1 326.2L959.8 325.4L960.4 324.7L961.1 324.1L961.9 323.6L962.7 323.1L963.5 322.7L964.3 322.4L965.1 322.2L965.9 322.1L966.6 322L967.4 322"/>
+          <use href="#hood-line" class="hood__pulse"/>
+          <use href="#hood-line" class="hood__pulse hood__pulse--late"/>
+          <circle class="hood__pen accent-fill" r="7" cx="500" cy="26" opacity="0"/>
+        </svg>
+        <h2 class="display display--hero" id="cta-title">Train on data that <span class="cta__mark">protects</span> people.</h2>
+        <div class="actions actions--center">
+          <a class="btn btn--solid" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20sample%20request">Request a sample</a>
+          <a class="btn" href="mailto:contact-us@muragala.lk?subject=Talk%20to%20MURAGALA">Talk to us</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__card">
+      <svg class="footer__outline" aria-hidden="true" focusable="false"><path pathLength="1" d="M0 0"/></svg>
+
+      <div class="footer__top">
+        <div class="footer__brand">
+          <a class="brand" href="#top" aria-label="MURAGALA, back to top">
+            <img src="assets/muragala-mark.png" alt="" width="83" height="156" loading="lazy">
+            <span>MURAGALA</span>
+          </a>
+          <p class="footer__tagline">Privacy-safe synthetic driving data and private model training for teams building autonomous vehicles and driver-assistance systems.</p>
+          <a class="btn btn--solid btn--sm" href="mailto:contact-us@muragala.lk?subject=MURAGALA%20sample%20request">Request a sample</a>
+          <ul class="footer__social" aria-label="MURAGALA on social media">
+            <li><a href="https://github.com/shndnth/R26-CS-010" target="_blank" rel="noopener" aria-label="MURAGALA on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a></li>
+          </ul>
+        </div>
+
+        <nav class="footer__col" aria-labelledby="footer-product">
+          <h2 class="footer__head" id="footer-product">Product</h2>
+          <ul>
+            <li><a href="#product">What you get</a></li>
+            <li><a href="#privacy">Privacy you can prove</a></li>
+            <li><a href="#quality">Quality you can check</a></li>
+            <li><a href="#legal">Ready for your legal team</a></li>
+            <li><a href="#how">How it works</a></li>
+          </ul>
+        </nav>
+
+        <div class="footer__col">
+          <h2 class="footer__head">Packages</h2>
+          <ul class="footer__prices">
+            <li><a href="#packages"><span>Starter</span><span class="footer__price">From $1,500</span></a></li>
+            <li><a href="#packages"><span>Pro</span><span class="footer__price">From $6,000</span></a></li>
+            <li><a href="#packages"><span>Enterprise</span><span class="footer__price">Contact us</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker__track">
+          <ul class="ticker__set">
+            <li>Synthetic data at any scale</li>
+            <li>Custom scenarios</li>
+            <li>RGB, depth, segmentation and box labels</li>
+            <li>Differential privacy</li>
+            <li>Private training under a hard budget</li>
+            <li>Attack tests on every model</li>
+            <li>Quality report on real road images</li>
+            <li>Data poisoning audit</li>
+            <li>Signed privacy certificate</li>
+            <li>Controls mapped to data protection law</li>
+            <li>On-premise deployment</li>
+            <li>Encryption and checksums for every file</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="footer__word" aria-hidden="true">MURAGALA</p>
+
+      <div class="footer__bottom">
+        <p class="footer__copy">&copy; 2026 MURAGALA</p>
+        <p class="footer__motto">Driving data that protects the people in it.</p>
+        <a class="footer__up" href="#top">Back to top
+          <svg viewBox="0 0 12 16" aria-hidden="true" focusable="false"><path d="M6 15V1M1 6l5-5 5 5"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

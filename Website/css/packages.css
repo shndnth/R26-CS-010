@@ -1,0 +1,93 @@
+/* MURAGALA: 07 Packages: the price cards. */
+
+/* ---------- Packages ---------- */
+
+.section {
+  position: relative;
+  padding: clamp(96px, 14vh, 160px) var(--gutter);
+  scroll-margin-top: var(--nav-h);
+}
+.wrap { max-width: 1200px; margin: 0 auto; }
+.wrap--narrow { max-width: 860px; }
+.section__title { max-width: 16ch; margin-bottom: clamp(40px, 7vh, 72px); }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 3vw, 40px);
+  border: 1.5px solid var(--ink);
+  border-radius: 20px;
+  background: var(--bg);
+}
+.card--featured { border: 2px solid var(--accent); }
+.card__badge {
+  position: absolute;
+  top: -14px;
+  left: clamp(28px, 3vw, 40px);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.card__name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.card__price {
+  margin-top: 18px;
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 3.6vw, 3.5rem);
+  line-height: 1;
+}
+.card__terms {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.card__summary {
+  margin-top: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+.card__list {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 32px;
+  flex: 1;
+  align-content: start;
+}
+.card__list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.card__list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.42em;
+  width: 10px;
+  height: 5px;
+  border-left: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 899px) {
+  .cards { grid-template-columns: 1fr; max-width: 520px; gap: 32px; }
+}

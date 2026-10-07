@@ -1,0 +1,129 @@
+/* MURAGALA: The floating nav, the small-screen menu and the phone scrollbar. */
+
+/* ---------- Nav ---------- */
+
+.nav {
+  position: fixed;
+  top: var(--bar-top);
+  left: var(--edge);
+  right: var(--edge);
+  z-index: 50;
+  height: var(--bar-h);
+  background: var(--bg);
+  border: 1px solid var(--edge-line);
+  border-radius: 999px;
+}
+.nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+  padding: 0 9px 0 22px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+.brand img { width: auto; height: 42px; flex: none; }
+/* The logo art is black line work; invert it to off-white for the dark page. */
+.brand img { filter: invert(92%); }
+::selection { background: var(--accent); color: var(--on-accent); }
+/* Trim the word's box to its capital letters, so flex centering lines the
+   letters up with the middle of the logo whatever the font metrics are.
+   The trailing letter-spacing is removed so the word is not pushed off center. */
+.brand span {
+  display: block;
+  line-height: 1;
+  margin-right: -0.2em;
+  text-box: trim-both cap alphabetic;
+}
+
+.nav__menu { position: relative; }
+.nav__links { display: flex; gap: 28px; }
+.nav__menu-cta { display: none; }
+.nav__links a {
+  position: relative;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 6px 0;
+}
+.nav__links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.nav__links a:hover::after,
+.nav__links a:focus-visible::after { transform: scaleX(1); }
+
+.nav__toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 14px/1 var(--sans);
+  cursor: pointer;
+}
+.nav__toggle-icon,
+.nav__toggle-icon::before {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--ink);
+  transition: transform 0.2s ease;
+}
+.nav__toggle-icon { position: relative; transform: translateY(-3px); }
+.nav__toggle-icon::before { content: ""; position: absolute; top: 6px; }
+.nav__toggle[aria-expanded="true"] .nav__toggle-icon { transform: translateY(0) rotate(45deg); }
+.nav__toggle[aria-expanded="true"] .nav__toggle-icon::before { transform: translateY(-6px) rotate(-90deg); }
+
+
+@media (max-width: 760px) {
+  :root { --bar-h: 56px; --bar-top: 10px; }
+  .nav__inner { gap: 12px; padding: 0 18px 0 18px; }
+  .brand img { height: 38px; }
+  .nav .brand { font-size: 13px; letter-spacing: 0.18em; }
+  .nav__cta { display: none; }
+  .nav__menu-cta { display: block; border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 8px; }
+  .nav__menu-cta a { font-weight: 500; }
+  .nav__toggle { display: inline-flex; }
+  .nav__links {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: -18px;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    min-width: 200px;
+    padding: 8px 0;
+    background: var(--bg);
+    border: 1.5px solid var(--ink);
+    border-radius: 20px;
+  }
+  .nav__links.is-open { display: flex; }
+  .nav__links a { display: block; padding: 12px 20px; }
+  .nav__links a::after { left: 20px; right: 20px; bottom: 8px; }
+}
+
+/* No scrollbar on phones and tablets: the page scrolls by touch. */
+@media (pointer: coarse), (max-width: 760px) {
+  html { scrollbar-width: none; }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}

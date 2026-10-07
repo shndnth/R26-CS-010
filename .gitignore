@@ -67,6 +67,9 @@ kitti_dataset/
 *.png
 *.jpg
 *.jpeg
+# The product website keeps its images (deployed to GitHub Pages).
+!Website/**/*.png
+!Website/**/*.jpg
 
 # --- Python -----------------------------------------------------------------
 __pycache__/
