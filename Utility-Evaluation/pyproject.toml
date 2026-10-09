@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "utility-evaluation"
+version = "1.0.0"
+description = "Utility Evaluation component for R26-CS-010: does privacy-preserving synthetic AV data still train a working perception model"
+requires-python = ">=3.11"
+authors = [{ name = "Apeksha M.K.S.R", email = "it22110220@my.sliit.lk" }]
+
+dependencies = [
+    "torch>=2.1",
+    "torchvision>=0.16",
+    "ultralytics>=8.1",
+    "torchmetrics[image]>=1.3",
+    "numpy>=1.24,<3",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "pillow>=10.0",
+    "r26-shared",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+ue-decrypt              = "scripts.decrypt_all_images:main"
+ue-explore              = "scripts.explore_data:main"
+ue-check-masks          = "scripts.check_class_masks:main"
+ue-detect               = "scripts.detect_poisoning:main"
+ue-prove-detection      = "scripts.prove_poison_detection:main"
+ue-extract-gt           = "scripts.extract_ground_truth:main"
+ue-verify-alignment     = "scripts.verify_label_alignment:main"
+ue-analyze-misalignment = "scripts.analyze_misalignment:main"
+ue-build                = "scripts.convert_to_yolo:main"
+ue-convert-kitti        = "scripts.kitti_to_yolo:main"
+ue-train                = "scripts.train_yolo:main"
+ue-resume               = "scripts.resume_training:main"
+ue-measure-map          = "scripts.measure_map:main"
+ue-cross-eval           = "scripts.cross_evaluation:main"
+ue-size-map             = "scripts.size_breakdown_map:main"
+ue-fid                  = "scripts.compute_fid:main"
+ue-report               = "scripts.build_report:main"
+ue-epsilon-study        = "scripts.epsilon_study:main"
+ue-joint-figure         = "scripts.joint_figure:main"
+
+[tool.setuptools.packages.find]
+include = ["utility_evaluation*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

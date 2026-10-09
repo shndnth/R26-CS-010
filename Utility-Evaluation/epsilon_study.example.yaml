@@ -1,0 +1,28 @@
+# Copy, fill in and pass to: ue-epsilon-study --plan <file>
+
+# One folder per variant is created here, plus epsilon_study.json.
+root: ../../R26_runs/epsilon_study
+
+# Optional real-data baseline. Without both, utility retention is not computed.
+kitti_dataset: ../../R26_runs/main/utility/kitti_dataset          # from ue-convert-kitti
+kitti_weights: ../../R26_runs/main/utility/runs/kitti_baseline/weights/best.pt
+
+# Identical for every variant, so differences come from the data.
+training:
+  model: yolov8n.pt
+  epochs: 50
+  imgsz: 640
+  batch: 8
+  patience: 15
+  seed: 42
+  workers: 8
+  device:              # 0 for the first GPU, cpu, or empty for automatic
+split_mode: random     # block keeps neighbouring frames in one split
+seed: 42
+
+# Each variant gives encrypted_dir or decrypted_dir; an empty epsilon means no DP.
+variants:
+  - {name: eps_1, epsilon: 1.0, encrypted_dir: ../../Datasets/eps_1/output}
+  - {name: eps_3, epsilon: 3.0, encrypted_dir: ../../Datasets/eps_3/output}
+  - {name: eps_8, epsilon: 8.0, encrypted_dir: ../../Datasets/eps_8/output}
+  - {name: no_dp, epsilon:, decrypted_dir: ../../R26_runs/main/decrypted}

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/utility_results.schema.json",
+  "title": "Utility findings (Utility Evaluation to Risk and Compliance)",
+  "type": "object",
+  "required": [
+    "experiments",
+    "utility_retention_pct",
+    "sim_to_real_gap_map50_95",
+    "fid",
+    "fid_sample_size",
+    "poisoning_verdict",
+    "experiments_missing"
+  ],
+  "properties": {
+    "experiments": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "synthetic -> synthetic",
+          "synthetic -> real",
+          "real -> real",
+          "real -> synthetic"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "map50",
+          "map50_95",
+          "per_class"
+        ],
+        "properties": {
+          "map50": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "map50_95": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "per_class": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "ap50",
+                    "ap50_95"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "utility_retention_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "sim_to_real_gap_map50_95": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "fid": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "fid_sample_size": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "poisoning_verdict": {
+      "enum": [
+        "PASS",
+        "FILTERED",
+        null
+      ]
+    },
+    "experiments_missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

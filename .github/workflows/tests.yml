@@ -39,6 +39,9 @@ jobs:
           - folder: Privacy-Integration
             torch: torch==2.5.1 torchvision==0.20.1
             install: -e shared -e "Privacy-Integration[dev]"
+          - folder: Utility-Evaluation
+            torch: torch torchvision
+            install: -e shared -e "Utility-Evaluation[dev]"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

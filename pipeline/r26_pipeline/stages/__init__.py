@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from r26_pipeline.config import PipelineConfig
-from r26_pipeline.stages import privacy
+from r26_pipeline.stages import privacy, utility
 from r26_pipeline.stages.base import (
     RELEASE_FIGURES,
     RELEASE_FILES,
@@ -21,7 +21,10 @@ def build_stages(cfg: PipelineConfig) -> list[Stage]:
     ctx = Context.of(cfg)
     stages = [
         *privacy.calibration(ctx),
+        *utility.intake(ctx),
+        *utility.poisoning(ctx),
         *privacy.training(ctx),
+        *utility.evaluation(ctx),
         *privacy.certificate(ctx),
     ]
     check_needs(stages)

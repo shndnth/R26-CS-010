@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/epsilon_study.schema.json",
+  "title": "Per-epsilon utility study (Utility Evaluation)",
+  "type": "object",
+  "required": [
+    "generated_at",
+    "training",
+    "variants",
+    "real -> real"
+  ],
+  "properties": {
+    "real -> real": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "map50",
+            "map50_95"
+          ],
+          "properties": {
+            "map50": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "map50_95": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        }
+      ]
+    },
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "epsilon",
+          "poisoning_verdict",
+          "synthetic -> synthetic",
+          "synthetic -> real",
+          "utility_retention_pct"
+        ],
+        "properties": {
+          "epsilon": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "poisoning_verdict": {
+            "enum": [
+              "PASS",
+              "FILTERED"
+            ]
+          },
+          "synthetic -> synthetic": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "map50",
+                  "map50_95"
+                ],
+                "properties": {
+                  "map50": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "map50_95": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            ]
+          },
+          "synthetic -> real": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "map50",
+                  "map50_95"
+                ],
+                "properties": {
+                  "map50": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "map50_95": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            ]
+          },
+          "utility_retention_pct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

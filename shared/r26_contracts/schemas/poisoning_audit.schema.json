@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/poisoning_audit.schema.json",
+  "title": "Data poisoning detection result (Utility Evaluation)",
+  "type": "object",
+  "required": [
+    "verdict",
+    "frames_scanned",
+    "boxes_scanned",
+    "frames_excluded",
+    "structural_anomalies",
+    "batches_rejected",
+    "towns"
+  ],
+  "properties": {
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FILTERED"
+      ]
+    },
+    "frames_scanned": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "frames_excluded": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}
