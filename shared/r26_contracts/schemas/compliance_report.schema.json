@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/compliance_report.schema.json",
+  "title": "Compliance report and verdict (Risk and Compliance to all)",
+  "type": "object",
+  "required": [
+    "overall_verdict",
+    "checks_run",
+    "checks_not_run",
+    "regulatory_mapping",
+    "declared_weaknesses"
+  ],
+  "properties": {
+    "overall_verdict": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCOMPLETE"
+      ]
+    },
+    "regulatory_mapping": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "provision",
+          "evidence_check",
+          "verified"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/calibration_composition.schema.json",
+  "title": "Calibration budget composition (Risk and Compliance)",
+  "type": "object",
+  "required": [
+    "verdict",
+    "claimed_total_epsilon",
+    "composed_total_epsilon",
+    "queries",
+    "per_query_epsilon_to_meet_claim"
+  ],
+  "properties": {
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "claimed_total_epsilon": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "composed_total_epsilon": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "queries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "query",
+          "sensitivity",
+          "laplace_scale",
+          "epsilon_spent"
+        ]
+      }
+    }
+  }
+}

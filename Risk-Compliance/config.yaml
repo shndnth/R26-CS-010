@@ -1,0 +1,21 @@
+thresholds:
+  epsilon_ceiling: 10.0            # from the Privacy Integration config
+  mia_success_ceiling: 55.0        # 50% is random guessing
+  reid_ceiling: 10.0
+  epsilon_agreement_tolerance: 1.0e-4
+
+calibration:
+  epsilon: 1.8                     # per query; seven queries spend 12.6 in total
+  sensitivities:
+    vehicle_density_per_km: 1.0
+    pedestrian_density_per_km: 1.0
+    avg_vehicle_speed_kmh: 2.0
+    avg_pedestrian_speed_kmh: 1.0
+    intersection_count_per_km: 1.0
+
+anonymity:
+  quasi_identifiers: [Weather_Category, Time_Of_Day, Event_Type, Town]
+  k_threshold: 5
+
+leakage:
+  scan_suffixes: [".json", ".csv", ".txt", ".yaml", ".yml", ".log", ".md"]

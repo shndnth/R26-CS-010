@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk-compliance"
+version = "1.0.0"
+description = "Risk and Compliance component for R26-CS-010: independent verification of the privacy pipeline and regulatory mapping"
+requires-python = ">=3.11"
+authors = [{ name = "Wijesinghe R.D.P.T.", email = "it22066916@my.sliit.lk" }]
+
+dependencies = [
+    "r26-shared",
+    "numpy>=1.24,<3",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "pycryptodome>=3.20",
+]
+
+[project.optional-dependencies]
+# Needed only for the independent MIA replication, which trains shadow models.
+attack = ["torch>=2.5", "torchvision>=0.20", "opacus==1.4.1"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+rc-verify-certs  = "scripts.verify_certificates:main"
+rc-audit-budgets = "scripts.audit_budgets:main"
+rc-reconstruct   = "scripts.reconstruction_attack:main"
+rc-scan-leakage  = "scripts.scan_leakage:main"
+rc-anonymity     = "scripts.measure_anonymity:main"
+rc-verify-manifest = "scripts.verify_manifest:main"
+rc-calibration-composition = "scripts.calibration_composition:main"
+rc-report        = "scripts.build_compliance_report:main"
+
+[tool.setuptools.packages.find]
+include = ["risk_compliance*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

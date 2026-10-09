@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r26/manifest_verification.schema.json",
+  "title": "Independent dataset manifest verification (Risk and Compliance)",
+  "type": "object",
+  "required": [
+    "towns_checked",
+    "files_verified",
+    "all_valid",
+    "towns"
+  ],
+  "properties": {
+    "all_valid": {
+      "type": "boolean"
+    }
+  }
+}
