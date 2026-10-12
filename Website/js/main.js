@@ -1,28 +1,34 @@
 /*
- * MURAGALA: one protective line, drawn by scroll.
+ * R26-CS-010 · MURAGALA research website.
  *
- * The page is a single pinned "deck". One GSAP timeline, scrubbed by scroll,
- * crossfades the words and drives one SVG path through every scene. On
- * desktop, Packages, FAQ, the closing call and the footer follow as slides.
- * With prefers-reduced-motion (or if GSAP fails to load) the scenes are plain
- * sections, each with a still drawing taken from the same timeline.
+ * A single page of readable sections. One part of Domain, "Research at a
+ * glance", is a short pinned story: one GSAP timeline, scrubbed by scroll,
+ * crossfades five steps and drives one SVG line through the drawings. With
+ * prefers-reduced-motion, or without JavaScript, every part is a plain
+ * section and the story steps show still drawings.
  *
  * Each file in js/ adds its parts to one shared namespace (window.MURAGALA);
  * index.html loads them in order and this file, last, wires them together.
  * Plain scripts (not modules), so the page also works when opened as a file.
  * Where to edit:
- *   shapes.js        the line's shapes (road, car, camera, ... route)
- *   scenes.js        the details drawn around the line in each scene
+ *   shapes.js        the line's shapes
+ *   scenes.js        the details drawn around the line in each step
  *   timeline.js      what happens at each scroll step, and how far apart
- *   life.js          the small loops that keep each scene moving
- *   slides.js        07, 08, 09 and the footer on desktop
- *   closing.js       the hood, headline and footer animations
+ *   life.js          the small loops that keep each drawing moving
+ *   sections.js      hero counters, nav highlight, pipeline, document buttons, transitions
+ *   contact-form.js  the contact form and its confirmation dialog
+ *   footer.js        the footer's outline, fact strip and name animations
  *   links.js         in-page links and the address bar
  */
 (() => {
   'use strict';
   const M = (window.MURAGALA = window.MURAGALA || {});
-  const { root, $, breathe, initNavMenu, sizeLines, createLine, buildScenes, centerScenes, finishScenes, createLogo, readTheme, createPager, buildTimeline, pinDeck, renderStills, createSmoothScroll, prepareSlides, createSlideSwitcher, bindSlideFocus, bindSlideKeys, setupClosing, startLife, initLinks } = M;
+  const {
+    root, $, breathe, initNavMenu, sizeLines, createLine, buildScenes, centerScenes, finishScenes,
+    createLogo, readTheme, createPager, buildTimeline, pinDeck, renderStills, createSmoothScroll,
+    startLife, initLinks, initCounters, initActiveNav, initPipeline, initFiles, initReveal,
+    initContactForm, initFooter,
+  } = M;
 
   async function run() {
     const gsap = window.gsap;
@@ -35,15 +41,17 @@
     }
 
     initNavMenu();
+    initActiveNav();
+    initFiles();
+    initContactForm();
     sizeLines();
     window.addEventListener('resize', sizeLines);
 
     // Without GSAP there is nothing more to draw; the page reads as plain sections.
     if (!gsap) return;
 
-    // Everything the modules share. ZONE is the scroll given to each desktop slide.
     const stage = $('.stage');
-    const ctx = { motion, stage, ZONE: 1.1, END: null, SLIDES: null, storyEnd: 0 };
+    const ctx = { motion, stage, storyEnd: 0 };
 
     ctx.line = createLine(stage);
     await breathe();
@@ -59,35 +67,29 @@
 
     if (!motion) {
       renderStills(ctx);
+      initFooter(false);
       return;
     }
 
     gsap.registerPlugin(ST);
     ST.config({ ignoreMobileResize: true });
     Object.assign(ctx, createSmoothScroll());
-    prepareSlides(ctx);
 
     ctx.logo.render();
+    ctx.logo.intro();
+    initCounters(motion);
+    initPipeline(motion);
+    initReveal(motion);
     ctx.line.renderLine();
 
     ctx.tl = buildTimeline(ctx, true);
     ctx.pager.bind(ctx.storyEnd || ctx.tl.duration());
-    const showSlideAt = createSlideSwitcher(ctx);
     await breathe();
-    ctx.deck = pinDeck(ctx, showSlideAt);
+    ctx.deck = pinDeck(ctx);
 
     startLife(ctx);
-    ctx.logo.intro();
-
-    // Phones: the closing section and the footer set up once the browser is idle.
-    if (!ctx.END) {
-      if ('requestIdleCallback' in window) requestIdleCallback(() => setupClosing(false), { timeout: 1500 });
-      else setTimeout(() => setupClosing(false), 300);
-    }
-
+    initFooter(true);
     initLinks(ctx);
-    bindSlideFocus(ctx);
-    bindSlideKeys(ctx);
     ST.addEventListener('refresh', sizeLines);
   }
 
@@ -104,7 +106,7 @@
         return;
       } catch (e) {}
     }
-    root.classList.remove('motion', 'slides', 'lenis');
+    root.classList.remove('motion', 'lenis');
     root.classList.add('static');
   });
 })();

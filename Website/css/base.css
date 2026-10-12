@@ -1,3 +1,16 @@
+/* Fallback fonts sized to match the web fonts, so text does not reflow
+   (and shift the page) when Instrument Serif and Inter finish loading. */
+@font-face {
+  font-family: "Instrument Serif Fallback";
+  src: local("Times New Roman");
+  size-adjust: 82.4%;
+}
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 106%;
+}
+
 /* MURAGALA: Colors, fonts, page basics, smooth scrolling and type. Edit the palette here. */
 
 :root {
@@ -12,8 +25,8 @@
   --cool: #2ee6ff;      /* electric cyan: data, sensors */
   --on-accent: #0b0c0f; /* text on amber */
 
-  --serif: "Instrument Serif", "Cormorant Garamond", Georgia, "Times New Roman", serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif: "Instrument Serif", "Instrument Serif Fallback", Georgia, serif;
+  --sans: "Inter", "Inter Fallback", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   /* The nav is a floating card: --bar-h tall, --bar-top from the top.
      --nav-h is the space it takes, which content keeps clear of. */

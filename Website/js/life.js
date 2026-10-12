@@ -9,7 +9,7 @@
 
   function startLife(ctx) {
     const gsap = window.gsap;
-    const { stage, END, SLIDES } = ctx;
+    const { stage } = ctx;
     const { L } = ctx.line;
     const { ACCENT } = ctx.theme;
     const {
@@ -51,7 +51,7 @@
 
     let starsA = 0, wheelA = 0, pickX = SKY_X[0];
     gsap.ticker.add((time, dt) => {
-      if (window.scrollY > ctx.deck.end + 50) return;
+      if (window.scrollY > ctx.deck.end + 50 || window.scrollY < ctx.deck.start - window.innerHeight) return;
       const s = Math.min(dt, 50) / 1000;
 
       if (isOn(gProblem)) {
@@ -122,15 +122,6 @@
         const k = Math.round(u * (N - 1)) * 2, w = SHAPES[8];
         pen.setAttribute('cx', f1(w[k]));
         pen.setAttribute('cy', f1(w[k + 1]));
-      }
-      // The hood's pen traces only while the closing slide is showing and drawn.
-      if (END) {
-        const ctaOn = SLIDES[2].style.opacity === '1' && END.hoodState.p > 0.999;
-        if (ctaOn !== END.penOn) {
-          END.penOn = ctaOn;
-          END.pen.setAttribute('opacity', ctaOn ? 1 : 0);
-          if (ctaOn) END.penLoop.play(); else END.penLoop.pause();
-        }
       }
     });
   }

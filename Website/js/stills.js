@@ -9,7 +9,7 @@
     const { stage } = ctx;
     const { renderLine } = ctx.line;
     const tl = buildTimeline(ctx, false);
-    const stills = { problem: 'problem-3', product: 'product-2', privacy: 'privacy-2', quality: 'quality-1', legal: 'legal-1', how: 'how-end' };
+    const stills = { 'glance-1': 'g1', 'glance-2': 'g2', 'glance-3': 'g3', 'glance-4': 'g4', 'glance-5': 'g5b' };
     Object.keys(stills).forEach((id) => {
       tl.seek(stills[id], false);
       renderLine();

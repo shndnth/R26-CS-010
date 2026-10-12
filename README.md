@@ -7,10 +7,10 @@
   <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Anaconda-Dark.svg" width="30" />
   <img src="https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GithubActions-Dark.svg" width="30" />
 
-  <h1>MURAGALA</h1>
+  <h1>R26-CS-010</h1>
   <p><b>Privacy-Enhanced Synthetic Data Generation for Autonomous Vehicle Training</b></p>
   <p>A framework that guards the point where real data enters a synthetic driving dataset: differential privacy on the statistics that calibrate the simulator and on the models trained from it, attacks that test those guarantees, a measure of what usefulness survives, and an independent audit against the GDPR.</p>
-  <p><a href="https://shndnth.github.io/R26-CS-010/"><b>Visit the MURAGALA website</b></a></p>
+  <p><a href="https://shndnth.github.io/R26-CS-010/"><b>Visit the project website</b></a></p>
 
 </div>
 
@@ -21,15 +21,9 @@
 Autonomous vehicle perception models need large volumes of labeled road
 footage, and that footage records people. Simulated data avoids recording
 anyone, but the simulator is tuned from real driving statistics, so the privacy
-risk comes back through that channel. **MURAGALA** places formal guarantees
+risk comes back through that channel. **The framework** places formal guarantees
 where real information enters, then checks that they hold, measures what they
 cost, and audits the result.
-
-The name comes from the *muragala*, the guard stone at the entrance of ancient
-Sri Lankan buildings, carved with a Naga king who protects the threshold. Like
-the guard stone, the framework stands at the doorway: real statistics pass only
-after the Laplace mechanism, data passes only after its manifest and poisoning
-checks, and nothing is released before an independent audit.
 
 ```
  OWNER'S MACHINE ONLY                    DATASET GENERATION (CARLA)

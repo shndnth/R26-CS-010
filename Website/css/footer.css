@@ -1,19 +1,17 @@
 /* MURAGALA: The footer card. */
 
-/* ---------- Footer ---------- */
-
-/* A floating card that matches the nav. With motion, its outline is drawn by
-   js/closing.js as one line; otherwise the border shows. */
+/* A floating card that matches the nav. */
 .footer { padding: 0 var(--edge) var(--bar-top); }
 .footer__card {
   position: relative;
   container-type: inline-size;
   padding: clamp(28px, 4vw, 56px) clamp(20px, 4vw, 56px) 22px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--edge-line);
   border-radius: 28px;
   background: var(--bg);
   overflow: hidden;
 }
+/* With motion, the border is drawn as one line by js/footer.js. */
 .footer__outline {
   position: absolute;
   inset: 0;
@@ -23,75 +21,13 @@
   overflow: visible;
   pointer-events: none;
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--edge-line);
   stroke-width: 1;
 }
-.motion .footer__card { border-color: transparent; }
-.motion .footer__outline { display: block; }
+.footer__card.is-drawn { border-color: transparent; }
+.footer__card.is-drawn .footer__outline { display: block; }
 
-.footer__top {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr));
-  gap: 40px 32px;
-}
-.footer__brand { display: grid; align-content: start; justify-items: start; gap: 18px; }
-.footer .brand img { height: 48px; }
-.footer__social { display: flex; flex-wrap: wrap; gap: 10px; }
-.footer__social a {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--edge-line);
-  border-radius: 50%;
-  color: var(--ink);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-.footer__social a:hover,
-.footer__social a:focus-visible {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
-  transform: translateY(-2px);
-}
-.footer__social svg { width: 17px; height: 17px; fill: currentColor; }
-.footer__tagline { max-width: 34ch; color: var(--muted); font-size: 15px; line-height: 1.55; }
-
-.footer__head {
-  margin-bottom: 16px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.footer__col ul { display: grid; gap: 10px; }
-.footer__col a {
-  position: relative;
-  display: inline-flex;
-  gap: 12px;
-  font-size: 15px;
-  text-decoration: none;
-}
-/* Links underline with a line that draws from the left. */
-.footer__col a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -3px;
-  height: 1px;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-.footer__col a:hover::after,
-.footer__col a:focus-visible::after { transform: scaleX(1); }
-.footer__prices a { display: flex; justify-content: space-between; min-width: min(100%, 220px); }
-.footer__price { font-family: var(--serif); font-size: 18px; line-height: 1.1; }
-
-/* A slow strip of what every dataset comes with. */
+/* A slow strip of the research's methods and checks. */
 .ticker {
   margin: clamp(36px, 5vw, 56px) calc(-1 * clamp(20px, 4vw, 56px)) 0;
   padding: 16px 0;
@@ -99,10 +35,7 @@
   border-bottom: 1px solid var(--rule);
   overflow: hidden;
 }
-.ticker__track {
-  display: flex;
-  width: max-content;
-}
+.ticker__track { display: flex; width: max-content; }
 .motion .ticker__track { animation: ticker 70s linear infinite; }
 .ticker:hover .ticker__track { animation-play-state: paused; }
 .ticker__set { display: flex; flex: none; }
@@ -124,7 +57,64 @@
 }
 @keyframes ticker { to { transform: translateX(-50%); } }
 
-/* The name, as large as the card allows. Letters rise in, and lift on hover. */
+.footer__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 40px 32px;
+}
+.footer__brand { display: grid; align-content: start; justify-items: start; gap: 16px; }
+.footer .brand img { height: 48px; }
+.footer__tagline { max-width: 40ch; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.footer__gh {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--edge-line);
+  border-radius: 50%;
+  color: var(--ink);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.footer__gh:hover,
+.footer__gh:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  transform: translateY(-2px);
+}
+.footer__gh svg { width: 17px; height: 17px; fill: currentColor; }
+
+.footer__head {
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.footer__links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; }
+.footer__links a {
+  position: relative;
+  font-size: 15px;
+  text-decoration: none;
+}
+/* Links underline with a line that draws from the left. */
+.footer__links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.footer__links a:hover::after,
+.footer__links a:focus-visible::after { transform: scaleX(1); }
+
+/* The name, as large as the card allows. */
 .footer__word {
   display: flex;
   justify-content: center;
@@ -136,6 +126,7 @@
   letter-spacing: 0.01em;
   user-select: none;
 }
+/* Letters rise in, and lift on hover. */
 .footer__word .ch { display: inline-block; overflow: hidden; padding-top: 0.04em; transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .footer__word .ch > span { display: inline-block; }
 .footer__word .ch:hover { transform: translateY(-0.06em); }
@@ -151,7 +142,6 @@
   font-size: 14px;
   color: var(--muted);
 }
-.footer__motto { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--ink); }
 .footer__up {
   display: inline-flex;
   align-items: center;
@@ -172,16 +162,39 @@
 .footer__up:hover svg,
 .footer__up:focus-visible svg { transform: translateY(-4px); }
 
-@media (max-width: 899px) {
-  .footer__top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .footer__brand { grid-column: 1 / -1; }
-}
 @media (max-width: 760px) {
+  .footer__top { grid-template-columns: 1fr; }
   .footer__card { border-radius: 24px; padding: 28px 20px 18px; }
   .ticker { margin-left: -20px; margin-right: -20px; }
   .footer__bottom { flex-direction: column; text-align: center; }
-  .footer__copy { order: 3; }
 }
-@media (max-width: 420px) {
-  .footer__top { grid-template-columns: 1fr; }
+
+/* On desktop the footer card fills the last screen below the nav. Spacing
+   and the big name scale with the screen height so the whole card shows. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .footer {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + 1vh);
+  }
+  .footer__card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding-top: clamp(22px, 4.5vh, 56px);
+  }
+  .footer__top { gap: clamp(20px, 3vh, 40px) 32px; }
+  .footer__brand { gap: clamp(10px, 1.8vh, 16px); }
+  .footer .brand img { height: clamp(36px, 5vh, 48px); }
+  .footer__head { margin-bottom: clamp(8px, 1.6vh, 16px); }
+  .footer__links { gap: clamp(4px, 1vh, 10px) 24px; }
+  .ticker { margin-top: clamp(16px, 3.5vh, 56px); padding: clamp(10px, 1.6vh, 16px) 0; }
+  .footer__word {
+    flex: 1;
+    align-items: center;
+    margin: clamp(10px, 2vh, 32px) 0;
+    font-size: min(21.5cqi, 24vh);
+  }
+  .footer__bottom { padding-top: clamp(10px, 1.8vh, 18px); }
 }

@@ -18,7 +18,7 @@
   align-items: center;
   gap: 24px;
   height: 100%;
-  padding: 0 9px 0 22px;
+  padding: 0 28px 0 22px;
 }
 .brand {
   display: inline-flex;
@@ -46,7 +46,6 @@
 
 .nav__menu { position: relative; }
 .nav__links { display: flex; gap: 28px; }
-.nav__menu-cta { display: none; }
 .nav__links a {
   position: relative;
   font-size: 15px;
@@ -94,14 +93,12 @@
 .nav__toggle[aria-expanded="true"] .nav__toggle-icon::before { transform: translateY(-6px) rotate(-90deg); }
 
 
-@media (max-width: 760px) {
+/* Seven links need room: below 1024px they move into the Menu button. */
+@media (max-width: 1023px) {
   :root { --bar-h: 56px; --bar-top: 10px; }
   .nav__inner { gap: 12px; padding: 0 18px 0 18px; }
   .brand img { height: 38px; }
   .nav .brand { font-size: 13px; letter-spacing: 0.18em; }
-  .nav__cta { display: none; }
-  .nav__menu-cta { display: block; border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 8px; }
-  .nav__menu-cta a { font-weight: 500; }
   .nav__toggle { display: inline-flex; }
   .nav__links {
     position: absolute;
