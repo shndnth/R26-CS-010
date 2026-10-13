@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dataset-generation"
+version = "1.0.0"
+description = "CARLA capture for R26-CS-010, calibrated from privatised statistics, encrypted at source"
+# The CARLA client fixes the Python version here.
+requires-python = ">=3.8"
+authors = [{ name = "Yubitha S.", email = "it22541284@my.sliit.lk" }]
+dependencies = [
+    "numpy>=1.24,<3",
+    "pillow>=10.0",
+    "pycryptodome>=3.19",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

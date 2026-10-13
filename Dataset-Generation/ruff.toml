@@ -1,0 +1,8 @@
+# Repository settings, adjusted for the capture scripts.
+extend = "../ruff.toml"
+# The CARLA client fixes the Python version for this folder.
+target-version = "py38"
+
+[lint]
+# os.path kept: capture_town.py needs a live CARLA server and cannot be tested here.
+ignore = ["SIM108", "PTH"]

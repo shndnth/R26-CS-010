@@ -38,6 +38,8 @@ jobs:
             install: -e shared -e "pipeline[dev]"
           - folder: Risk-Compliance
             install: -e shared -e "Risk-Compliance[dev]"
+          - folder: Dataset-Generation
+            install: -e "Dataset-Generation[dev]"
           - folder: Privacy-Integration
             torch: torch==2.5.1 torchvision==0.20.1
             install: -e shared -e "Privacy-Integration[dev]"
