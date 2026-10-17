@@ -163,6 +163,61 @@ def calibration_accounting(outputs_dir: Path, default_per_query: float) -> dict:
     }
 
 
+def calibration_limitation(calibration: dict, target_total: float) -> dict:
+    """Known-limitation entry for the calibration budget, depending on how it was run."""
+    total, per_query, n = (
+        calibration["epsilon_total"],
+        calibration["epsilon_per_query"],
+        calibration["queries"],
+    )
+    if total <= target_total * (1 + 1e-4):
+        return {
+            "issue": "Calibration total epsilon was understated in earlier outputs, now fixed",
+            "severity": "low",
+            "detail": f"Earlier releases ran each of the {n} calibration queries at epsilon 1.8, "
+            "which composes to 12.6, while the outputs reported 1.8. The calibration "
+            f"now splits a total budget of {target_total:g} evenly, so each query runs "
+            f"at {per_query:.4f} and the {n} queries compose to {total:g}.",
+            "status": "Resolved: found by IT22066916's composition check; the budget is now "
+            "enforced as a total, not per query, and the composition check passes.",
+            "scope": "Calibration protects the real driving statistics; DP-SGD protects the "
+            "synthetic training frames. Budgets spent on different data do not add. "
+            "Use final_epsilon for training and this section for calibration.",
+            "remediation": "A dataset is covered by this total only if it was captured from "
+            "statistics released at this budget. Data captured from the earlier "
+            "statistics carries the 12.6 total.",
+        }
+    return {
+        "issue": "Calibration total epsilon exceeds the target",
+        "severity": "medium",
+        "detail": f"Each of the {n} calibration queries ran at epsilon {per_query:g}. They read "
+        f"the same records, so they compose to {total:g}, above the target total "
+        f"of {target_total:g}. The noise added was correct for the per-query value.",
+        "status": "Reported correctly; found by IT22066916's composition check.",
+        "scope": "Calibration protects the real driving statistics; DP-SGD protects the "
+        "synthetic training frames. Budgets spent on different data do not add. "
+        "Use final_epsilon for training and this section for calibration.",
+        "remediation": f"Rerun pi-calibrate with --epsilon-total {target_total:g} (each query at "
+        f"{target_total / n:.4f}) and capture the dataset again from the new statistics.",
+    }
+
+
+def stress_test_section(outputs_dir: Path) -> dict:
+    """Overfitted-baseline stress test (pi-stress), when it has been run."""
+    path = outputs_dir / "stress_test" / "stress_test_summary.json"
+    if not path.is_file():
+        return {"status": "not run", "how": "pi-stress --data-dir <decrypted towns>"}
+    summary = read_json(path)
+    return {
+        "status": "run",
+        "purpose": "Positive control for the attacks and response to the PP2 panel comment",
+        "regime": summary.get("regime"),
+        "comparisons": summary.get("comparisons"),
+        "verdict": summary.get("verdict"),
+        "source": path.name,
+    }
+
+
 def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict:
     cfg = settings()
     baseline = evidence.get(BASELINE_TAG)
@@ -172,16 +227,16 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
         raise SystemExit("no DP configurations found; run training first")
 
     ceiling = cfg.attack.success_rate_ceiling
-    calibration = calibration_accounting(cfg.outputs_dir, cfg.privacy.epsilon_calibration_max - 0.2)
+    calibration = calibration_accounting(
+        cfg.outputs_dir, cfg.privacy.epsilon_calibration_total / CALIBRATION_QUERIES
+    )
 
     # Every DP run must satisfy both the budget ceiling and the attack ceiling
     budget_respected = all(
         e.final_epsilons and max(e.final_epsilons) <= cfg.privacy.epsilon_total_max
         for e in dp_configs.values()
     )
-    attack_within_ceiling = all(
-        e.attack_rate and max(e.attack_rate) <= ceiling for e in dp_configs.values()
-    )
+    attack_within_ceiling = all(e.attack_rate and max(e.attack_rate) <= ceiling for e in dp_configs.values())
 
     all_dp_attack_auc = [v for e in dp_configs.values() for v in e.attack_auc]
     baseline_attack_auc = baseline.attack_auc if baseline else []
@@ -206,7 +261,6 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
             "against membership inference attack. Does not certify downstream data "
             "utility or overall regulatory compliance; see pending_sections."
         ),
-
         "privacy_mechanism": {
             "calibration_stage": {
                 "mechanism": "Laplace",
@@ -228,17 +282,15 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
                 "secure_rng_enabled": cfg.privacy.secure_rng,
             },
         },
-
         "configurations": {tag: e.as_dict() for tag, e in sorted(evidence.items())},
-
         "budget_enforcement": {
             "ceiling": cfg.privacy.epsilon_total_max,
             "all_runs_within_ceiling": budget_respected,
             "any_run_halted_early": False,
             "evidence": "Per-step budget logs retained for every DP run; final epsilon "
-                        "in each audit report reconciles with the final logged value.",
+            "in each audit report reconciles with the final logged value.",
         },
-
+        "stress_test": stress_test_section(cfg.outputs_dir),
         "empirical_validation": {
             "method": (
                 "Shadow-model membership inference attack with a two-feature signal "
@@ -250,15 +302,18 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
             "non_private_baseline_attack_auc": {
                 "values": baseline_attack_auc,
                 "range": [round(min(baseline_attack_auc), 4), round(max(baseline_attack_auc), 4)]
-                if baseline_attack_auc else None,
+                if baseline_attack_auc
+                else None,
             },
             "dp_attack_auc": {
                 "n_runs": len(all_dp_attack_auc),
                 "range": [round(min(all_dp_attack_auc), 4), round(max(all_dp_attack_auc), 4)]
-                if all_dp_attack_auc else None,
+                if all_dp_attack_auc
+                else None,
             },
             "ranges_overlap": bool(
-                baseline_attack_auc and all_dp_attack_auc
+                baseline_attack_auc
+                and all_dp_attack_auc
                 and min(baseline_attack_auc) <= max(all_dp_attack_auc)
             ),
             "all_dp_configs_within_ceiling": attack_within_ceiling,
@@ -269,13 +324,11 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
                 "near 0.50 could not be distinguished from a non-functional attack."
             ),
         },
-
         "utility_cost": {
             "metric": "Test AUC on a held-out stratified split",
             "comparison": "Non-private baseline minus each DP configuration, paired within seed",
             "per_configuration": utility_cost,
         },
-
         "reproducibility": {
             "seeds_completed": sorted({s for e in evidence.values() for s in e.seeds}),
             "determinism_verified": True,
@@ -286,79 +339,52 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
             ),
             "controls": "Python, NumPy and Torch RNGs seeded; cuDNN autotuning disabled.",
         },
-
         "declared_limitations": [
             {
                 "issue": "Opacus secure_mode disabled",
                 "severity": "medium",
                 "detail": "DP noise is drawn from a standard pseudo-random generator rather "
-                          "than a cryptographically secure one.",
+                "than a cryptographically secure one.",
                 "cause": "torchcsprng, which secure_mode needs, is unmaintained and only supports "
-                         "PyTorch 1.8.1, so it cannot run with PyTorch 2.5 on any OS.",
+                "PyTorch 1.8.1, so it cannot run with PyTorch 2.5 on any OS.",
                 "remediation": "Use a secure noise source once one supports current PyTorch.",
             },
             {
                 "issue": "Minority-class oversampling duplicates records",
                 "severity": "medium",
                 "detail": "The training split is balanced by duplicating minority-class "
-                          "indices, so those records are not independent under DP accounting.",
+                "indices, so those records are not independent under DP accounting.",
                 "cause": "Opacus replaces the DataLoader sampler during make_private because "
-                         "RDP accounting requires Poisson subsampling, so sampler-based "
-                         "balancing is silently discarded.",
+                "RDP accounting requires Poisson subsampling, so sampler-based "
+                "balancing is silently discarded.",
                 "remediation": "Documented as a known tradeoff. The alternative was "
-                               "majority-class collapse, under which the model learns nothing.",
+                "majority-class collapse, under which the model learns nothing.",
             },
-            {
-                "issue": "Calibration total epsilon was understated, now corrected",
-                "severity": "medium",
-                "detail": f"Each of the {calibration['queries']} calibration queries ran at epsilon "
-                          f"{calibration['epsilon_per_query']:g}. They read the same records, so "
-                          f"they compose to {calibration['epsilon_total']:g}, which earlier outputs "
-                          f"recorded as {calibration['epsilon_per_query']:g}. The noise added was "
-                          "correct for the per-query value; only the reported total was wrong.",
-                "status": "Resolved in the accounting: found by IT22066916's composition check, "
-                          "the total is now reported correctly. The published statistics are "
-                          "unchanged, so the dataset generated from them remains valid. The total "
-                          "is a weak guarantee on paper, applied to seven aggregate statistics "
-                          "rather than to individual records.",
-                "scope": "Calibration protects the real driving statistics; DP-SGD protects the "
-                         "synthetic training frames. Budgets spent on different data do not add, "
-                         "so the calibration total does not combine with any training epsilon. "
-                         "Per-run audit reports signed before this correction also carry "
-                         "calibration_epsilon (the per-query value) and total_epsilon (which adds "
-                         "budgets spent on different data); reports written since carry neither. "
-                         "Use final_epsilon for training and this section for calibration.",
-                "remediation": f"Future work: run each query at "
-                               f"{calibration['epsilon_per_query'] / calibration['queries']:.3f} so the "
-                               f"total is {calibration['epsilon_per_query']:g}. This needs new "
-                               "statistics and a new capture, so it is outside the current schedule.",
-            },
+            calibration_limitation(calibration, cfg.privacy.epsilon_calibration_total),
             {
                 "issue": "Limited replication",
                 "severity": "low",
                 "detail": f"{min(e.n for e in evidence.values())} seed(s) per configuration. "
-                          "Sufficient for the DP-versus-baseline comparison, insufficient to "
-                          "resolve differences between epsilon values, which are small "
-                          "relative to seed variance.",
+                "Sufficient for the DP-versus-baseline comparison, insufficient to "
+                "resolve differences between epsilon values, which are small "
+                "relative to seed variance.",
                 "remediation": "Additional seeds would narrow the confidence interval.",
             },
         ],
-
         "pending_sections": {
             "utility_assessment": {
                 "owner": "IT22110220 (Utility Evaluation)",
                 "required": "mAP and FID for models trained on the synthetic dataset, "
-                            "benchmarked against a real-data baseline.",
+                "benchmarked against a real-data baseline.",
                 "status": "not yet supplied",
             },
             "compliance_verification": {
                 "owner": "IT22066916 (Risk and Compliance)",
                 "required": "Independent audit of the artefacts in this certificate, and "
-                            "the regulatory mapping and verdict.",
+                "the regulatory mapping and verdict.",
                 "status": "artefacts delivered; verification in progress",
             },
         },
-
         "certification": {
             "privacy_enforcement": "PASS" if budget_respected else "FAIL",
             "empirical_validation": "PASS" if attack_within_ceiling else "FAIL",

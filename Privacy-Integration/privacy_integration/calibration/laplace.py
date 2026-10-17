@@ -52,19 +52,47 @@ class LaplaceCalibrationModule:
         "intersection_count_per_km": 1.0,
     }
 
+    NUM_QUERIES: int = 7  # five scalars and two histograms, all over the same records
+
     def __init__(
         self,
         epsilon_calibration: float,
         random_seed: int = 42,
     ) -> None:
-        if epsilon_calibration >= EPSILON_CALIBRATION_MAX:
+        """`epsilon_calibration` is the budget of ONE query; see `from_total` for a total budget."""
+        if not 0 < epsilon_calibration < EPSILON_CALIBRATION_MAX:
             raise ValueError(
-                f"epsilon_calibration={epsilon_calibration} must be below "
-                f"{EPSILON_CALIBRATION_MAX}, the per-query cap."
+                f"epsilon_calibration={epsilon_calibration} must lie in (0, "
+                f"{EPSILON_CALIBRATION_MAX}), the per-query cap."
             )
         self._epsilon = epsilon_calibration
         self._rng = np.random.default_rng(random_seed)
-        logger.info("Initialised | epsilon=%.4f", epsilon_calibration)
+        self.budget_mode = "per_query"
+        self.epsilon_total_target: float | None = None
+        logger.info("Initialised | epsilon per query=%.4f", epsilon_calibration)
+
+    @classmethod
+    def from_total(cls, epsilon_total: float, random_seed: int = 42) -> LaplaceCalibrationModule:
+        """Split a total budget evenly over the queries so that they compose to `epsilon_total`.
+
+        The queries read the same records, so under sequential composition the total is the
+        sum of the per-query budgets. Running each query at epsilon_total / 7 keeps the whole
+        release within epsilon_total.
+        """
+        if epsilon_total <= 0:
+            raise ValueError("epsilon_total must be positive")
+        module = cls(epsilon_total / cls.NUM_QUERIES, random_seed)
+        module.budget_mode = "total_split_evenly"
+        module.epsilon_total_target = epsilon_total
+        logger.info(
+            "Total budget %.4f split over %d queries -> %.4f each",
+            epsilon_total, cls.NUM_QUERIES, module._epsilon,
+        )
+        return module
+
+    @property
+    def epsilon_per_query(self) -> float:
+        return self._epsilon
 
     def _laplace(self, sensitivity: float) -> float:
         return float(self._rng.laplace(loc=0.0, scale=sensitivity / self._epsilon))
@@ -80,7 +108,7 @@ class LaplaceCalibrationModule:
             name=name,
             sensitivity=sensitivity,
             noise=round(noise, 6),
-            epsilon_used=round(sensitivity / self._epsilon, 6),
+            epsilon_used=self._epsilon,
         )
         logger.debug(
             "%s | true=%.4f noise=%.4f noised=%.4f",
@@ -105,7 +133,7 @@ class LaplaceCalibrationModule:
             name=name,
             sensitivity=sensitivity,
             noise=float("nan"),
-            epsilon_used=round(sensitivity / self._epsilon, 6),
+            epsilon_used=self._epsilon,
         )
         logger.debug("%s | noised=%s", name, noised)
         return noised, record
@@ -140,8 +168,9 @@ class LaplaceCalibrationModule:
         # Sequential composition: every query reads the same records.
         total = self._epsilon * len(query_log)
         privatised["calibration_epsilon_spent"] = round(total, 4)
-        privatised["calibration_epsilon_per_query"] = round(self._epsilon, 4)
+        privatised["calibration_epsilon_per_query"] = round(self._epsilon, 6)
         privatised["num_queries"] = len(query_log)
+        privatised["budget_mode"] = self.budget_mode
         privatised["generated_at"] = timestamp()
         privatised["note"] = (
             "All values Laplace-noised. No raw sensor data included. "
@@ -159,10 +188,13 @@ class LaplaceCalibrationModule:
         logger.info("Calibration stats saved -> %s", path)
 
     def save_audit_log(self, result: CalibrationResult, path: Path | str) -> None:
+        total = self._epsilon * len(result.query_log)
         log = {
             "epsilon_calibration": self._epsilon,
             "epsilon_per_query": self._epsilon,
-            "epsilon_total": round(self._epsilon * len(result.query_log), 6),
+            "epsilon_total": round(total, 6),
+            "epsilon_total_target": self.epsilon_total_target,
+            "budget_mode": self.budget_mode,
             "composition": "sequential: every query reads the same records",
             "generated_at": result.generated_at,
             "queries": [
@@ -171,8 +203,8 @@ class LaplaceCalibrationModule:
                     "sensitivity": r.sensitivity,
                     "noise_added": r.noise,
                     "epsilon_used": r.epsilon_used,
-                    "laplace_scale": r.epsilon_used,
-                    "epsilon_spent": self._epsilon,
+                    "laplace_scale": round(r.sensitivity / r.epsilon_used, 6),
+                    "epsilon_spent": r.epsilon_used,
                 }
                 for r in result.query_log
             ],

@@ -31,7 +31,8 @@ def calibration(ctx: Context) -> list[Stage]:
             args=(
                 "--input", str(cfg.inputs.calibration_source),
                 "--output-dir", str(ws.calibration),
-                *opt("--epsilon", cfg.privacy.calibration_epsilon),
+                *(opt("--epsilon", cfg.privacy.calibration_epsilon)
+                  or opt("--epsilon-total", cfg.privacy.calibration_epsilon_total)),
             ),
             inputs=tuple(x for x in (cfg.inputs.calibration_source,) if x),
             outputs=(

@@ -67,6 +67,7 @@ class PrivacySettings:
     epochs: int | None = None
     shadow_epochs: int | None = None
     attack_epochs: int | None = None
+    calibration_epsilon_total: float | None = None
     calibration_epsilon: float | None = None
 
 

@@ -1,6 +1,7 @@
 privacy:
   epsilon_total_max: 10.0          # hard ceiling; the RDP accountant halts training here
-  epsilon_calibration_max: 2.0     # cap on each calibration query; 7 queries spend 7x the per-query value
+  epsilon_calibration_max: 2.0     # cap on each calibration query
+  epsilon_calibration_total: 1.8   # total calibration budget, split evenly over the 7 queries (0.2571 each)
   delta: 1.0e-5
   clipping_norm: 1.0               # per-sample gradient L2 bound (C in DP-SGD)
   random_seed: 42

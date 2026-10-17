@@ -23,11 +23,19 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="Path to JSON file containing raw aggregate calibration statistics.",
     )
-    parser.add_argument(
+    budget = parser.add_mutually_exclusive_group()
+    budget.add_argument(
+        "--epsilon-total",
+        type=float,
+        default=None,
+        help="Total calibration budget, split evenly over the 7 queries "
+             "(default: epsilon_calibration_total in config.yaml).",
+    )
+    budget.add_argument(
         "--epsilon",
         type=float,
         default=None,
-        help=f"Epsilon per calibration query (default: from config.yaml, below {EPSILON_CALIBRATION_MAX}).",
+        help=f"Legacy: epsilon PER QUERY (below {EPSILON_CALIBRATION_MAX}); the total is 7x this.",
     )
     parser.add_argument(
         "--seed",
@@ -48,7 +56,6 @@ def main() -> None:
     args = parse_args()
     cfg = settings()
 
-    epsilon = args.epsilon or cfg.privacy.epsilon_calibration_max - 0.2
     seed = args.seed or cfg.privacy.random_seed
     output_dir = args.output_dir or cfg.outputs_dir / "calibration"
 
@@ -57,10 +64,13 @@ def main() -> None:
     raw_stats = load_json(args.input)
     logger.info("Loaded input from %s", args.input)
 
-    module = LaplaceCalibrationModule(
-        epsilon_calibration=epsilon,
-        random_seed=seed,
-    )
+    if args.epsilon is not None:
+        logger.warning("--epsilon is per query; the 7 queries compose to %.4f", 7 * args.epsilon)
+        module = LaplaceCalibrationModule(epsilon_calibration=args.epsilon, random_seed=seed)
+    else:
+        total = args.epsilon_total or cfg.privacy.epsilon_calibration_total
+        module = LaplaceCalibrationModule.from_total(total, random_seed=seed)
+    epsilon = module.epsilon_per_query
 
     result = module.process(raw_stats)
 

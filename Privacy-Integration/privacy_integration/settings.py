@@ -23,10 +23,13 @@ class PrivacySettings:
     clipping_norm: float
     random_seed: int
     secure_rng: bool
+    epsilon_calibration_total: float = 1.8
 
     def __post_init__(self) -> None:
         if self.epsilon_calibration_max >= self.epsilon_total_max:
             raise ConfigError("epsilon_calibration_max must be below epsilon_total_max")
+        if not 0 < self.epsilon_calibration_total < self.epsilon_total_max:
+            raise ConfigError("epsilon_calibration_total must lie in (0, epsilon_total_max)")
         if not 0 < self.delta < 1:
             raise ConfigError("delta must lie in (0, 1)")
         if self.clipping_norm <= 0:
@@ -117,6 +120,7 @@ def load_settings(path: Path | None = None) -> Settings:
             clipping_norm=float(privacy_raw["clipping_norm"]),
             random_seed=int(privacy_raw["random_seed"]),
             secure_rng=bool(privacy_raw.get("secure_rng", False)),
+            epsilon_calibration_total=float(privacy_raw.get("epsilon_calibration_total", 1.8)),
         ),
         dataset=DatasetSettings(
             batch_size=int(dataset_raw["batch_size"]),

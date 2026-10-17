@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 from pathlib import Path
 
@@ -66,7 +67,10 @@ def test_integrated_verdict(run_dir):
 
 def test_calibration_reports_the_sequential_total(run_dir):
     stats = json.loads((run_dir / "run" / "release" / "calibration_stats.json").read_text())
-    assert stats["calibration_epsilon_spent"] == 7 * stats["calibration_epsilon_per_query"]
+    assert math.isclose(
+        stats["calibration_epsilon_spent"], 7 * stats["calibration_epsilon_per_query"], rel_tol=1e-4
+    )
+    assert math.isclose(stats["calibration_epsilon_spent"], 1.8, rel_tol=1e-4)
     composition = json.loads((run_dir / "run" / "compliance" / "calibration_composition.json").read_text())
     assert composition["verdict"] == "PASS"
 

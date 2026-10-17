@@ -29,7 +29,7 @@ cost, and audits the result.
  OWNER'S MACHINE ONLY                    DATASET GENERATION (CARLA)
 ┌----------------------------------┐     ┌--------------------------------------------┐
 │ Real driving statistics          │     │ Five towns: RGB, depth, semantic, labels   │
-│ Laplace: 7 queries, ε 1.8 each   │ ──► │ AES-256 at source, SHA-256 manifests       │
+│ Laplace: 7 queries, ε 1.8 total  │ ──► │ AES-256 at source, SHA-256 manifests       │
 └----------------------------------┘     └----------------------┬---------------------┘
                                                                 │ encrypted delivery
  PIPELINE (r26, one environment per component)                  ▼
@@ -47,7 +47,7 @@ cost, and audits the result.
 ## Key Features
 
 ### Privacy Integration
-* **Private Calibration:** The Laplace mechanism privatizes seven aggregate driving statistics at ε = 1.8 each, 12.6 in total under sequential composition, before they configure CARLA. The real values never leave the owner's machine.
+* **Private Calibration:** The Laplace mechanism privatizes seven aggregate driving statistics with a total budget of ε = 1.8 (about 0.257 per query under sequential composition), before they configure CARLA. The real values never leave the owner's machine.
 * **DP-SGD Training:** Opacus 1.4.1 with an RDP accountant, per-sample clipping (C = 1.0), δ = 1e-5 and target budgets of ε 1, 3 and 8, with an automatic halt at ε = 10. A non-private baseline sets the utility ceiling.
 * **Guarantees Tested, Not Assumed:** A shadow-model membership inference attack on confidence and per-sample loss, plus a loss-threshold attack reporting the true-positive rate at 1% and 5% false positives. Under DP both attacks fall to chance level (AUC about 0.50 to 0.51).
 * **Signed Evidence:** Every training run writes an audit report signed with HMAC-SHA256, and a joint certificate combines the privacy evidence with the utility results.
@@ -190,7 +190,7 @@ Every push runs the same checks on GitHub Actions: the commit checks, each compo
 
 | Stage | Mechanism | Budget | Protects | Evidence |
 |---|---|---|---|---|
-| Calibration | Laplace | ε = 1.8 per query, 12.6 over 7 queries | The real driving statistics | Audit log, reconstruction attack, composition check |
+| Calibration | Laplace | ε = 1.8 in total, 0.257 per query over 7 queries | The real driving statistics | Audit log, reconstruction attack, composition check |
 | Training | DP-SGD (Opacus, RDP) | ε 1, 3 or 8, δ = 1e-5, halt at 10 | The synthetic training frames | Signed audit report and budget log per run |
 | Validation | Membership inference | | | Attack AUC per configuration and seed |
 

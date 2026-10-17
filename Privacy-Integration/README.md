@@ -9,8 +9,11 @@ The component enforces ε-DP at two points in the pipeline and validates the
 guarantee empirically rather than assuming it:
 
 1. **Calibration:** the Laplace mechanism privatizes aggregate statistics
-   before they configure the CARLA simulator. Seven queries at ε = 1.8 each
-   compose to a total of 12.6, reported as `calibration_epsilon_spent`.
+   before they configure the CARLA simulator. A total budget of ε = 1.8 is
+   split evenly over the seven queries (ε ≈ 0.257 each), so they compose to
+   1.8 under sequential composition, reported as `calibration_epsilon_spent`.
+   Earlier releases ran each query at 1.8 (12.6 in total); `pi-calibrate
+   --epsilon` still reproduces that per-query mode.
 2. **Training:** Opacus DP-SGD applies per-sample gradient clipping and
    Gaussian noise, with RDP accounting and an automatic budget halt.
 3. **Validation:** a shadow-model membership inference attack with a

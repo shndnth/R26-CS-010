@@ -92,18 +92,19 @@ Privatised aggregate statistics. Laplace noise already applied. Safe to share.
                                 "rain": 0.24,  "fog": 0.00 },
   "time_of_day_distribution": { "morning": 0.14, "afternoon": 0.12,
                                 "evening": 0.57, "night": 0.17 },
-  "calibration_epsilon_spent": 12.6,
-  "calibration_epsilon_per_query": 1.8,
+  "calibration_epsilon_spent": 1.8,
+  "calibration_epsilon_per_query": 0.257143,
   "num_queries": 7,
+  "budget_mode": "total_split_evenly",
   "generated_at": "ISO-8601 UTC"
 }
 ```
 
 `calibration_epsilon_spent` is the total over all queries: each query reads
-the same records, so their costs add under sequential composition (7 x 1.8 =
-12.6). Files delivered before the correction record the per-query value (1.8)
-in this field; their statistics are identical, so data generated from them is
-unaffected.
+the same records, so their costs add under sequential composition. The
+default splits a total of 1.8 evenly, so each query runs at 1.8 / 7 = 0.257.
+Files from earlier releases ran each query at 1.8 (12.6 in total); the oldest
+of them record the per-query value (1.8) in this field.
 
 **Rules**
 
