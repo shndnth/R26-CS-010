@@ -51,7 +51,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def print_results(comparisons: list[dict], verdict: dict) -> None:
+def print_results(
+    comparisons: list[dict], verdict: dict, ordering: list[dict] | None = None, seeds: list[int] | None = None
+) -> None:
+    if seeds:
+        print(f"\nseeds: {', '.join(map(str, seeds))}")
     print(
         f"\n{'config':<10}{'no_dp AUC':>11}{'DP AUC':>9}{'drop':>8}{'removed':>9}"
         f"{'p (1-sided)':>13}  significant"
@@ -63,6 +67,14 @@ def print_results(comparisons: list[dict], verdict: dict) -> None:
             f"{c['attack_auc_drop_mean']:>8.4f}{c['advantage_removed_pct']:>8.1f}%{p:>13}  "
             f"{c['significant']}"
         )
+    if ordering:
+        print("\nstronger privacy, weaker attack? (paired, one-sided)")
+        for o in ordering:
+            p = "n/a" if o["p_value_one_sided"] is None else f"{o['p_value_one_sided']:.4g}"
+            print(
+                f"  {o['higher_epsilon']} > {o['lower_epsilon']}: AUC +{o['attack_auc_difference_mean']}"
+                f"  p {p}  significant {o['significant']}"
+            )
     print(f"\npositive control ({NON_PRIVATE} leaks): {verdict['positive_control']}")
     print(f"  rule: {verdict['positive_control_rule']}")
     print(f"DP reduction: {verdict['dp_reduction']}")
@@ -118,6 +130,7 @@ def main() -> None:
 
     comparisons = summary.compare()
     verdict = summary.verdict()
+    ordering = summary.ordering()
     report = {
         "description": (
             "Stress test of DP-SGD against membership inference. Every target trains on a small "
@@ -144,6 +157,7 @@ def main() -> None:
         "runs": [r.as_dict() for r in summary.runs],
         "comparisons": comparisons,
         "verdict": verdict,
+        "epsilon_ordering": ordering,
     }
     write_json(report, out_dir / "stress_test_summary.json")
 
@@ -153,7 +167,13 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
 
-    print_results(comparisons, verdict)
+    print_results(comparisons, verdict, ordering, summary.seeds())
+    others = sorted({int(p.name.split("_")[1]) for p in out_dir.glob("seed_*_*.json")} - set(summary.seeds()))
+    if others:
+        print(
+            f"\nearlier seeds are also in this folder ({', '.join(map(str, others))}); "
+            "run pi-stress-rescore --from-runs to combine them with this run"
+        )
     print(f"results in {out_dir}")
 
 

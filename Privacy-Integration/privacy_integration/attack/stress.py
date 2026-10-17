@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import numpy as np
 from scipy import stats
@@ -164,6 +165,43 @@ class StressSummary:
             grouped.setdefault(run.config, []).append(run)
         return grouped
 
+    def seeds(self) -> list[int]:
+        return sorted({r.seed for r in self.runs})
+
+    def ordering(self) -> list[dict]:
+        """Does a larger epsilon leave a stronger attack?
+
+        Paired one-sided t-test between neighbouring budgets.
+        """
+        grouped = self.by_config()
+        private = sorted(
+            (
+                (runs[0].epsilon, tag, {r.seed: r.attack_auc for r in runs})
+                for tag, runs in grouped.items()
+                if tag != NON_PRIVATE
+            ),
+            key=lambda item: item[0],
+        )
+        rows = []
+        for (_, tag_lo, lo), (_, tag_hi, hi) in zip(private, private[1:], strict=False):
+            seeds = sorted(set(lo) & set(hi))
+            a, b = np.array([hi[s] for s in seeds]), np.array([lo[s] for s in seeds])
+            diff = a - b
+            p = None
+            if len(diff) > 1 and np.std(diff) > 0:
+                p = float(stats.ttest_rel(a, b, alternative="greater").pvalue)
+            rows.append(
+                {
+                    "higher_epsilon": tag_hi,
+                    "lower_epsilon": tag_lo,
+                    "seeds": len(seeds),
+                    "attack_auc_difference_mean": round(float(diff.mean()), 4) if len(diff) else None,
+                    "p_value_one_sided": None if p is None else round(p, 5),
+                    "significant": p is not None and p < SIGNIFICANCE_LEVEL,
+                }
+            )
+        return rows
+
     def compare(self) -> list[dict]:
         """No-DP versus each DP config: mean drop in attack AUC with a paired t-test over seeds."""
         grouped = self.by_config()
@@ -264,3 +302,21 @@ def from_report(report: dict) -> StressSummary:
             )
         )
     return StressSummary(runs)
+
+
+def from_run_files(folder: Path) -> StressSummary:
+    """Rebuild a summary from every per-run file (seed_<n>_<config>.json) in a folder.
+
+    Each pi-stress run writes one file per seed and configuration, so runs made on
+    different days (for example seeds 42 to 44, then 45 and 46) can be combined.
+    """
+    import json
+
+    runs = []
+    for path in sorted(Path(folder).glob("seed_*_*.json")):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        if "attack_auc_ci95" in record and "config" in record:
+            runs.append(record)
+    if not runs:
+        raise FileNotFoundError(f"no seed_<n>_<config>.json files in {folder}")
+    return from_report({"runs": runs})

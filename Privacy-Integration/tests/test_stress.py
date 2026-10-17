@@ -198,3 +198,56 @@ def test_rescore_rebuilds_from_saved_report(tmp_path, monkeypatch):
     assert updated["verdict"]["dp_reduction"] == "SIGNIFICANT"
     assert updated["previous_verdicts"][0]["verdict"]["positive_control"] == "FAIL"
     assert all("significant" in c for c in updated["comparisons"])
+
+
+def test_from_run_files_combines_seed_runs_from_different_days(tmp_path):
+    import json
+
+    from privacy_integration.attack.stress import from_run_files
+
+    summary = _leaky_but_below_old_cutoff()
+    for run in summary.runs:
+        (tmp_path / f"seed_{run.seed}_{run.config}.json").write_text(json.dumps(run.as_dict()))
+    (tmp_path / "stress_test_summary.json").write_text("{}")
+    rebuilt = from_run_files(tmp_path)
+    assert rebuilt.seeds() == [1, 2, 3]
+    assert len(rebuilt.runs) == len(summary.runs)
+    assert rebuilt.verdict() == summary.verdict()
+
+
+def test_ordering_detects_stronger_privacy_weaker_attack():
+    runs = []
+    for seed, (e1, e8) in enumerate(((0.48, 0.54), (0.50, 0.57), (0.49, 0.55), (0.50, 0.55)), start=1):
+        runs.append(_run(NON_PRIVATE, seed, 0.62, (0.58, 0.66)))
+        r1 = _run("eps_1", seed, e1, (e1 - 0.03, e1 + 0.03))
+        r8 = _run("eps_8", seed, e8, (e8 - 0.03, e8 + 0.03))
+        r8.epsilon = 8.0
+        runs += [r1, r8]
+    row = StressSummary(runs).ordering()[0]
+    assert (row["higher_epsilon"], row["lower_epsilon"]) == ("eps_8", "eps_1")
+    assert row["significant"] and row["seeds"] == 4
+
+
+def test_rescore_from_runs(tmp_path, monkeypatch):
+    import json
+    import sys
+
+    from scripts import rescore_stress_test
+
+    summary = _leaky_but_below_old_cutoff()
+    for run in summary.runs:
+        (tmp_path / f"seed_{run.seed}_{run.config}.json").write_text(json.dumps(run.as_dict()))
+    old = {
+        "generated_at": "t0",
+        "regime": {"epochs": 60},
+        "runs": [summary.runs[0].as_dict()],
+        "verdict": {"positive_control": "FAIL", "dp_reduction": "NOT SHOWN"},
+    }
+    path = tmp_path / "stress_test_summary.json"
+    path.write_text(json.dumps(old))
+    monkeypatch.setattr(sys, "argv", ["pi-stress-rescore", "--summary", str(path), "--from-runs"])
+    rescore_stress_test.main()
+    updated = json.loads(path.read_text())
+    assert updated["regime"]["seeds"] == [1, 2, 3] and updated["regime"]["epochs"] == 60
+    assert len(updated["runs"]) == 9 and updated["combined_from_run_files"]
+    assert "epsilon_ordering" in updated

@@ -50,6 +50,7 @@ Each stage is also runnable as `python -m scripts.<name>`.
 ```bash
 pi-stress --data-dir <decrypted> --seeds 42 43 44
 pi-stress-rescore          # recompute the verdict from saved results, no retraining
+pi-stress-rescore --from-runs   # combine seeds run at different times (e.g. 42-44, then 45-46)
 ```
 
 Every target trains on 500 members for 60 epochs, so the model without DP
@@ -61,6 +62,13 @@ attack AUC comes from DP. Results go to `outputs/stress_test/`.
   wholly above chance (0.5).
 - **DP reduction:** for every ε, a paired one-sided t-test over seeds gives
   p < 0.05.
+- **Budget ordering (reported, not part of the verdict):** paired one-sided
+  t-tests between neighbouring budgets check that a larger ε leaves a
+  stronger attack.
+
+Each run writes one file per seed and configuration
+(`seed_<n>_<config>.json`), and the summary covers only the seeds of that run.
+`pi-stress-rescore --from-runs` rebuilds the summary from every per-run file.
 
 The first version used stricter, arbitrary cut-offs (no-DP CI lower bound at
 least 0.60, and fully separate CIs on every seed). They were replaced by the
