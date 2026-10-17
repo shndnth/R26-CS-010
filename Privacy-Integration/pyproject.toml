@@ -38,6 +38,7 @@ pi-decrypt = "scripts.decrypt_dataset:main"
 pi-analyse-labels = "scripts.analyse_labels:main"
 pi-report = "scripts.build_report:main"
 pi-stress = "scripts.run_stress_test:main"
+pi-stress-rescore = "scripts.rescore_stress_test:main"
 
 [tool.setuptools.packages.find]
 include = ["privacy_integration*", "scripts*"]

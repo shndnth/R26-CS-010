@@ -333,6 +333,16 @@
   font-variant-numeric: tabular-nums;
 }
 .finding__text { color: var(--muted); font-size: 15px; line-height: 1.6; }
+/* A before and after pair: the unprotected value is dimmed, the protected one stands out. */
+.finding__from { color: var(--muted); }
+.finding__arrow {
+  display: inline-block;
+  margin: 0 0.22em;
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.62em;
+  vertical-align: 0.18em;
+}
 
 .tags { display: flex; flex-wrap: wrap; gap: 10px; }
 .tags li {

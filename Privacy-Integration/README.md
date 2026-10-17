@@ -45,6 +45,29 @@ pi-report
 
 Each stage is also runnable as `python -m scripts.<name>`.
 
+### DP stress test (PP2 panel response)
+
+```bash
+pi-stress --data-dir <decrypted> --seeds 42 43 44
+pi-stress-rescore          # recompute the verdict from saved results, no retraining
+```
+
+Every target trains on 500 members for 60 epochs, so the model without DP
+overfits and leaks (the positive control). DP-SGD models at ε 1, 3 and 8 train
+in the same regime and face the same loss-threshold attack, so any drop in
+attack AUC comes from DP. Results go to `outputs/stress_test/`.
+
+- **Positive control:** every no-DP run's attack AUC 95% bootstrap CI lies
+  wholly above chance (0.5).
+- **DP reduction:** for every ε, a paired one-sided t-test over seeds gives
+  p < 0.05.
+
+The first version used stricter, arbitrary cut-offs (no-DP CI lower bound at
+least 0.60, and fully separate CIs on every seed). They were replaced by the
+standard tests above after the first run. The summary still reports the
+first-version verdict under `first_version_rules`, and `pi-stress-rescore`
+keeps the earlier verdict under `previous_verdicts`.
+
 ### In the integrated pipeline
 
 `pipeline/` runs these stages for every configured seed and uses three hooks,

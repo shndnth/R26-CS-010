@@ -12,7 +12,7 @@ import csv
 from privacy_integration.attack.stress import (
     NON_PRIVATE,
     OVERFIT_LR,
-    POSITIVE_CONTROL_MIN_AUC,
+    SIGNIFICANCE_LEVEL,
     StressRegime,
     StressSummary,
     pick_members,
@@ -49,6 +49,29 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", type=str, default=None, choices=["cuda", "cpu"])
     parser.add_argument("--seed", type=int, default=None, help=argparse.SUPPRESS)
     return parser.parse_args()
+
+
+def print_results(comparisons: list[dict], verdict: dict) -> None:
+    print(
+        f"\n{'config':<10}{'no_dp AUC':>11}{'DP AUC':>9}{'drop':>8}{'removed':>9}"
+        f"{'p (1-sided)':>13}  significant"
+    )
+    for c in comparisons:
+        p = "n/a" if c["p_value_one_sided"] is None else f"{c['p_value_one_sided']:.4g}"
+        print(
+            f"{c['config']:<10}{c['no_dp_attack_auc_mean']:>11.4f}{c['dp_attack_auc_mean']:>9.4f}"
+            f"{c['attack_auc_drop_mean']:>8.4f}{c['advantage_removed_pct']:>8.1f}%{p:>13}  "
+            f"{c['significant']}"
+        )
+    print(f"\npositive control ({NON_PRIVATE} leaks): {verdict['positive_control']}")
+    print(f"  rule: {verdict['positive_control_rule']}")
+    print(f"DP reduction: {verdict['dp_reduction']}")
+    print(f"  rule: {verdict['dp_reduction_rule']}")
+    first = verdict["first_version_rules"]
+    print(
+        f"\nfirst-version (stricter) rules, reported for transparency: "
+        f"control {first['positive_control']}, reduction {first['dp_reduction']}"
+    )
 
 
 def main() -> None:
@@ -116,7 +139,7 @@ def main() -> None:
             "clipping_norm": cfg.privacy.clipping_norm,
             "bootstrap_resamples": regime.bootstrap,
             "seeds": args.seeds,
-            "positive_control_min_auc": POSITIVE_CONTROL_MIN_AUC,
+            "significance_level": SIGNIFICANCE_LEVEL,
         },
         "runs": [r.as_dict() for r in summary.runs],
         "comparisons": comparisons,
@@ -130,19 +153,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
 
-    print(
-        f"\n{'config':<10}{'no_dp AUC':>11}{'DP AUC':>9}{'drop':>8}{'removed':>9}"
-        f"{'p (1-sided)':>13}  CIs disjoint"
-    )
-    for c in comparisons:
-        p = "n/a" if c["p_value_one_sided"] is None else f"{c['p_value_one_sided']:.4g}"
-        print(
-            f"{c['config']:<10}{c['no_dp_attack_auc_mean']:>11.4f}{c['dp_attack_auc_mean']:>9.4f}"
-            f"{c['attack_auc_drop_mean']:>8.4f}{c['advantage_removed_pct']:>8.1f}%{p:>13}  "
-            f"{c['ci95_disjoint_every_seed']}"
-        )
-    print(f"\npositive control ({NON_PRIVATE} leaks): {verdict['positive_control']}")
-    print(f"DP reduction: {verdict['dp_reduction']}")
+    print_results(comparisons, verdict)
     print(f"results in {out_dir}")
 
 

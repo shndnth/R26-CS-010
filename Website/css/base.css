@@ -95,6 +95,18 @@ a { color: inherit; }
 .skip:focus { top: 12px; }
 [tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
 .nowrap { white-space: nowrap; }
+/* Text for screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---------- Type ---------- */
 

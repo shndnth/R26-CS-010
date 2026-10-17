@@ -1,0 +1,129 @@
+/* Phones and touch screens: room for the notch, a smoother menu, larger
+   touch targets and press feedback. Loaded last, so it refines the other
+   files without changing the desktop layout. */
+
+/* ---------- Touch basics ---------- */
+
+html { -webkit-tap-highlight-color: transparent; }
+a, button, label, input, textarea, summary { touch-action: manipulation; }
+p, li, dd { text-wrap: pretty; }
+
+/* ---------- Safe areas (notch, rounded corners, home bar) ----------
+   Needs viewport-fit=cover in the viewport meta tag. --nav-h follows
+   --bar-top, so content still clears the nav. */
+
+:root { --bar-top: max(14px, env(safe-area-inset-top, 0px)); }
+.nav {
+  left: max(var(--edge), env(safe-area-inset-left, 0px));
+  right: max(var(--edge), env(safe-area-inset-right, 0px));
+}
+.footer {
+  padding-left: max(var(--edge), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--edge), env(safe-area-inset-right, 0px));
+  padding-bottom: max(var(--bar-top), env(safe-area-inset-bottom, 0px));
+}
+
+/* ---------- The small-screen menu ----------
+   Fades and slides in instead of popping, and scrolls by itself on short
+   screens. Hidden links stay out of the tab order (visibility: hidden). */
+
+@media (max-width: 1023px) {
+  :root { --bar-top: max(10px, env(safe-area-inset-top, 0px)); }
+
+  .nav__links {
+    display: flex;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top right;
+    pointer-events: none;
+    max-height: calc(100svh - var(--nav-h) - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    transition:
+      opacity 0.22s ease,
+      transform 0.26s cubic-bezier(0.2, 0.7, 0.2, 1),
+      visibility 0s linear 0.26s;
+  }
+  .nav__links.is-open {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .nav__links a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 20px;
+  }
+  .nav__links a::after { bottom: 10px; }
+  .nav__links a.is-current { color: var(--accent); }
+}
+
+/* On phones the menu is a sheet as wide as the nav bar. */
+@media (max-width: 560px) {
+  .nav__links {
+    right: -19px;
+    width: calc(100vw - 2 * max(var(--edge), env(safe-area-inset-left, 0px)));
+    min-width: 0;
+    border-radius: 24px;
+  }
+  .nav__links a { min-height: 52px; font-size: 16px; }
+  .nav__links li + li a { border-top: 1px solid var(--rule); }
+}
+
+/* ---------- Touch targets (about 44px or more) ---------- */
+
+@media (pointer: coarse), (max-width: 760px) {
+  .brand { min-height: 44px; }
+  .nav__toggle { min-height: 44px; padding: 0 6px; }
+
+  .pager__skip { min-height: 44px; }
+
+  .tl-tabs label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; }
+
+  .person__email a,
+  .contact__link,
+  .footer__up {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .footer__links { gap: 0 24px; }
+  .footer__links a { display: inline-flex; align-items: center; min-height: 44px; }
+  .footer__links a::after { bottom: 10px; }
+  .footer__gh { width: 44px; height: 44px; }
+}
+
+/* ---------- Press feedback ----------
+   Touch screens have no hover, so buttons answer the press instead, and
+   hover effects do not stick after a tap. */
+
+@media (hover: none) {
+  .btn,
+  .pager__skip,
+  .footer__gh,
+  .tl-tabs label { transition: background-color 0.2s ease, color 0.2s ease, transform 0.12s ease; }
+  .btn:active,
+  .pager__skip:active,
+  .footer__gh:active,
+  .tl-tabs label:active { transform: scale(0.96); }
+
+  .btn:hover { background: var(--bg); color: var(--ink); }
+  .btn--solid:hover { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+  .btn:active { background: var(--ink); color: var(--bg); }
+  .btn--solid:active { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+  .footer__gh:hover { transform: none; }
+  .footer__word .ch:hover { transform: none; }
+}
+
+/* ---------- Small phones (about 360px wide) ---------- */
+
+@media (max-width: 380px) {
+  .actions .btn { width: 100%; }
+  .finding__num { font-size: 2rem; }
+}
