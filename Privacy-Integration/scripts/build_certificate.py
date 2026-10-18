@@ -218,6 +218,25 @@ def stress_test_section(outputs_dir: Path) -> dict:
     }
 
 
+def calibrated_attack_section(outputs_dir: Path) -> dict:
+    """Reference-calibrated attack on the stress-test targets (pi-stress-calibrated), when run."""
+    path = outputs_dir / "stress_test" / "calibrated" / "calibrated_summary.json"
+    if not path.is_file():
+        return {"status": "not run", "how": "pi-stress-calibrated --data-dir <decrypted towns>"}
+    summary = read_json(path)
+    return {
+        "status": "run",
+        "method": "Reference-calibrated membership inference (offline, fixed variance), after "
+        "Carlini et al. (2022) and Watson et al. (2022)",
+        "regime": summary.get("regime"),
+        "comparisons": summary.get("comparisons"),
+        "low_fpr_comparisons": summary.get("low_fpr_comparisons"),
+        "verdict": summary.get("verdict"),
+        "targets_match_stress_runs": summary.get("targets_match_stress_runs"),
+        "source": "stress_test/calibrated/" + path.name,
+    }
+
+
 def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict:
     cfg = settings()
     baseline = evidence.get(BASELINE_TAG)
@@ -291,6 +310,7 @@ def build_certificate(evidence: dict[str, ConfigEvidence], company: str) -> dict
             "in each audit report reconciles with the final logged value.",
         },
         "stress_test": stress_test_section(cfg.outputs_dir),
+        "calibrated_attack": calibrated_attack_section(cfg.outputs_dir),
         "empirical_validation": {
             "method": (
                 "Shadow-model membership inference attack with a two-feature signal "
@@ -424,6 +444,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate the privacy certificate")
     parser.add_argument("--company", type=str, default="R26-CS-010 Research Group")
     parser.add_argument("--no-sign", action="store_true", help="Skip HMAC signing")
+    parser.add_argument("--no-pdf", action="store_true", help="Skip the printable PDF certificate")
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="Check the existing certificate, its signature and its PDF instead of building them",
+    )
     parser.add_argument(
         "--utility-results",
         type=Path,
@@ -433,9 +459,47 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def verify_existing(root: Path) -> None:
+    """Check privacy_certificate.json against its signature and its PDF; exit 1 on any mismatch."""
+    from privacy_integration.audit.certificate_pdf import verify_pdf
+
+    cert = root / "privacy_certificate.json"
+    sig = root / "privacy_certificate_signature.json"
+    pdf, rec = root / "privacy_certificate.pdf", root / "privacy_certificate_pdf.json"
+    if not cert.is_file():
+        raise SystemExit(f"no certificate at {cert}")
+    results = {"signature_valid": CertificateSigner().verify(cert, sig) if sig.is_file() else None}
+    if pdf.is_file() and rec.is_file():
+        check = verify_pdf(cert, pdf, rec)
+        results |= {
+            "certificate_matches_pdf_record": check.certificate_matches,
+            "pdf_unchanged": check.pdf_matches,
+            "pdf_embeds_hash": check.pdf_embeds_hash,
+        }
+    for name, value in results.items():
+        print(f"{name:<32}{'not checked' if value is None else value}")
+    ok = all(v is not False for v in results.values())
+    print(f"\nVERDICT: {'PASS' if ok else 'FAIL'}")
+    raise SystemExit(0 if ok else 1)
+
+
+def write_pdf(root: Path) -> Path:
+    from privacy_integration.audit.certificate_pdf import collect, record, render
+
+    cert = root / "privacy_certificate.json"
+    pdf = root / "privacy_certificate.pdf"
+    data = collect(cert, root / "privacy_certificate_signature.json")
+    render(data, pdf)
+    write_json(record(data, pdf), root / "privacy_certificate_pdf.json")
+    logger.info("PDF certificate %s written to %s", data.cert_id, pdf)
+    return pdf
+
+
 def main() -> None:
     args = parse_args()
     store = ArtifactStore()
+    if args.verify:
+        verify_existing(store.root.parent)
 
     evidence = collect_evidence(store)
     if not evidence:
@@ -455,6 +519,8 @@ def main() -> None:
     if not args.no_sign:
         signature_path = store.root.parent / "privacy_certificate_signature.json"
         CertificateSigner().sign(output, signature_path)
+    if not args.no_pdf:
+        write_pdf(store.root.parent)
 
     verdict = certificate["certification"]
     print(f"\n{'configuration':<12}{'ε':>6}{'seeds':>7}{'utility AUC':>14}{'attack AUC':>13}")

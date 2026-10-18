@@ -20,6 +20,7 @@ dependencies = [
     "matplotlib>=3.7",
     "pyyaml>=6.0",
     "pillow>=10.0",
+    "reportlab>=4.0",
     "r26-shared",
 ]
 
@@ -37,6 +38,7 @@ pi-attack = "scripts.run_mia_study:main"
 pi-decrypt = "scripts.decrypt_dataset:main"
 pi-analyse-labels = "scripts.analyse_labels:main"
 pi-report = "scripts.build_report:main"
+pi-certificate = "scripts.build_certificate:main"
 pi-stress = "scripts.run_stress_test:main"
 pi-stress-rescore = "scripts.rescore_stress_test:main"
 pi-stress-calibrated = "scripts.run_calibrated_stress:main"

@@ -45,6 +45,22 @@ pi-report
 
 Each stage is also runnable as `python -m scripts.<name>`.
 
+### Privacy certificate
+
+```bash
+pi-certificate            # privacy_certificate.json, its HMAC signature and a one-page PDF
+pi-certificate --verify   # checks the JSON against its signature and the PDF against its record
+```
+
+`pi-certificate` is the same as `python -m scripts.build_certificate`. The PDF
+(`outputs/privacy_certificate.pdf`) summarises the certificate: the verdict,
+each configuration's budget, test AUC and attack AUC, the calibration budget,
+the stress test and calibrated attack when they have been run, and the declared
+limitations. It prints the SHA-256 of `privacy_certificate.json`, the HMAC
+signature from `privacy_certificate_signature.json` and a QR code of the hash;
+`privacy_certificate_pdf.json` records the SHA-256 of the PDF. Signature lines
+are blank for hand signing. Add `--no-pdf` to skip the PDF.
+
 ### DP stress test (PP2 panel response)
 
 ```bash
