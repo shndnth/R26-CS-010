@@ -70,6 +70,31 @@ Each run writes one file per seed and configuration
 (`seed_<n>_<config>.json`), and the summary covers only the seeds of that run.
 `pi-stress-rescore --from-runs` rebuilds the summary from every per-run file.
 
+### Stronger attack: reference-calibrated (offline LiRA-style)
+
+```bash
+pi-stress-calibrated --data-dir <decrypted> --seeds 42 43 44
+```
+
+Retrains the same stress-test targets (same seed, members and regime) and
+attacks them with a reference-calibrated attack after Carlini et al. (2022)
+and Watson et al. (2022). Four non-private reference models per seed, trained
+on frames that are never attacked, estimate how easy each frame is; the attack
+scores how much better the target does on a frame than the references expect,
+using the logit of the true-label probability and one shared variance. This
+can catch individual members at a low false-positive rate, where the plain
+loss threshold cannot.
+
+Results go to `outputs/stress_test/calibrated/` (`calibrated_summary.json`),
+with the same verdict rules plus a paired comparison of TPR at 1% FPR. Each
+record also reports the plain loss attack on the retrained target and whether
+it reproduces the earlier `pi-stress` run. The command is safe to stop and
+rerun: finished runs are skipped and reference results are cached per seed.
+About 2.5 hours per seed on an RTX 3050 Ti.
+
+Limits: references are non-private and there are only four per seed, so this
+is weaker than full LiRA with many shadow models trained like each target.
+
 The first version used stricter, arbitrary cut-offs (no-DP CI lower bound at
 least 0.60, and fully separate CIs on every seed). They were replaced by the
 standard tests above after the first run. The summary still reports the

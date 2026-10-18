@@ -107,6 +107,30 @@ def pick_members(
     return subsample_to(train_idx, size, seed), subsample_to(test_idx, size, seed + 1)
 
 
+def train_target(
+    dataset: Dataset,
+    labels: Sequence[int],
+    members: list[int],
+    epsilon: float | None,
+    regime: StressRegime,
+    device: str,
+    cfg: Settings,
+):
+    """Train one target in the overfitting regime. Returns the model and its final epsilon."""
+    balanced = balance_by_oversampling(members, labels)
+    loader = DataLoader(Subset(dataset, balanced), batch_size=regime.batch_size, shuffle=True)
+    if epsilon is None:
+        return train_baseline(loader, None, regime.epochs, OVERFIT_LR, device), None
+    model, result, _sigma = train_private(epsilon, loader, regime.epochs, DP_DEFAULT_LR, device, cfg)
+    return model, float(result.final_epsilon)
+
+
+def eval_indices(split, nonmembers: list[int]) -> list[int]:
+    """Held-out test frames for utility, excluding the non-members used by the attack."""
+    held_out = set(nonmembers)
+    return [i for i in split.test if i not in held_out] or list(split.test)
+
+
 def run_one(
     dataset: Dataset,
     labels: Sequence[int],
@@ -120,15 +144,7 @@ def run_one(
     cfg: Settings,
 ) -> StressRun:
     """Train one target in the overfitting regime and attack it."""
-    balanced = balance_by_oversampling(members, labels)
-    loader = DataLoader(Subset(dataset, balanced), batch_size=regime.batch_size, shuffle=True)
-
-    if epsilon is None:
-        model = train_baseline(loader, None, regime.epochs, OVERFIT_LR, device)
-        final_epsilon = None
-    else:
-        model, result, _sigma = train_private(epsilon, loader, regime.epochs, DP_DEFAULT_LR, device, cfg)
-        final_epsilon = float(result.final_epsilon)
+    model, final_epsilon = train_target(dataset, labels, members, epsilon, regime, device, cfg)
 
     def losses(idx: Sequence[int]) -> np.ndarray:
         loader = DataLoader(Subset(dataset, list(idx)), batch_size=regime.batch_size)
