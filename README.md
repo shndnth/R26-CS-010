@@ -50,7 +50,9 @@ cost, and audits the result.
 * **Private Calibration:** The Laplace mechanism privatizes seven aggregate driving statistics with a total budget of ε = 1.8 (about 0.257 per query under sequential composition), before they configure CARLA. The real values never leave the owner's machine.
 * **DP-SGD Training:** Opacus 1.4.1 with an RDP accountant, per-sample clipping (C = 1.0), δ = 1e-5 and target budgets of ε 1, 3 and 8, with an automatic halt at ε = 10. A non-private baseline sets the utility ceiling.
 * **Guarantees Tested, Not Assumed:** A shadow-model membership inference attack on confidence and per-sample loss, plus a loss-threshold attack reporting the true-positive rate at 1% and 5% false positives. Under DP both attacks fall to chance level (AUC about 0.50 to 0.51).
-* **Signed Evidence:** Every training run writes an audit report signed with HMAC-SHA256, and a joint certificate combines the privacy evidence with the utility results.
+* **Stress Test:** Models trained to memorize a small member set make the no-DP control leak on purpose (attack AUC 0.628 over five seeds); DP-SGD brings it to 0.501 at ε = 1, significant at every budget (p ≤ 0.001), with stronger privacy giving a weaker attack.
+* **Calibrated Attack:** A reference-calibrated attack after LiRA catches 7.9% of members at a 1% false-positive rate without DP and 1.1% (chance) at ε = 1.
+* **Signed Evidence:** Every training run writes an audit report signed with HMAC-SHA256. The privacy certificate combines the privacy evidence with the utility results and is also printed as a one-page PDF carrying its SHA-256 fingerprint, signature and QR code.
 
 ### Utility Evaluation
 * **Poisoning Gate:** Structural checks per frame, a chi-square test per batch of 100 frames and a cross-town comparison. Rejected frames never reach any model, including the privacy classifiers.
@@ -63,6 +65,7 @@ cost, and audits the result.
 * **Attacks on the Calibration Channel:** A reconstruction attack on the published statistics and a composition check on the calibration budget.
 * **Leakage and k-Anonymity:** Released files are scanned for paths, credentials and coordinates, and frame metadata must reach k = 5.
 * **Regulatory Verdict:** Each provision of GDPR Articles 5, 17, 25 and 32 is marked verified only when the check behind it passed, with declared weaknesses carried into every report.
+* **Compliance Certificate:** The compliance report is printed as a one-page PDF with its SHA-256 fingerprint, HMAC signature and QR code; `rc-certificate --verify` shows whether the report or the PDF changed.
 
 ### Dataset Generation
 * **Calibrated Capture:** Five CARLA towns, about 2000 frame sets each, with weather, time of day, traffic density and speed drawn from the privatized statistics.
@@ -153,9 +156,9 @@ The integrated verdict is in `release/pipeline_report.json`:
 
 | Component | Environment | Commands |
 |---|---|---|
-| Privacy Integration | `research` | `pi-calibrate`, `pi-train`, `pi-attack`, `pi-report`, `python -m scripts.build_certificate` |
+| Privacy Integration | `research` | `pi-calibrate`, `pi-train`, `pi-attack`, `pi-report`, `pi-stress`, `pi-stress-rescore`, `pi-stress-calibrated`, `pi-certificate` |
 | Utility Evaluation | `utility` | `ue-decrypt`, `ue-detect`, `ue-build`, `ue-train`, `ue-cross-eval`, `ue-fid`, `ue-report`, `ue-epsilon-study`, `ue-joint-figure` |
-| Risk and Compliance | `compliance` | `rc-verify-manifest`, `rc-verify-certs`, `rc-audit-budgets`, `rc-reconstruct`, `rc-calibration-composition`, `rc-anonymity`, `rc-scan-leakage`, `rc-report` |
+| Risk and Compliance | `compliance` | `rc-verify-manifest`, `rc-verify-certs`, `rc-audit-budgets`, `rc-reconstruct`, `rc-calibration-composition`, `rc-anonymity`, `rc-scan-leakage`, `rc-report`, `rc-certificate` |
 | Dataset Generation | CARLA client | `python scripts/capture_town.py --town town01` |
 
 Every command takes `--help`. Each component's README has the full sequence.
@@ -165,15 +168,15 @@ Every command takes `--help`. Each component's README has the full sequence.
 ```bash
 cd shared && pytest                  # 50 tests
 cd pipeline && pytest                # 37 tests
-cd Privacy-Integration && pytest     # 107 tests
+cd Privacy-Integration && pytest     # 135 tests
 cd Utility-Evaluation && pytest      # 117 tests
-cd Risk-Compliance && pytest         # 73 tests
+cd Risk-Compliance && pytest         # 79 tests
 cd Dataset-Generation && pytest      # 14 tests, CARLA stubbed
 R26_E2E=1 pytest pipeline/tests/test_end_to_end.py   # the whole pipeline on generated data
 ruff check .
 ```
 
-The suites cover decryption and manifest checks, key loading, every handoff contract, the stage graph and gates, Laplace noise and its accounting, DP-SGD budgets and the halt, the attack features, certificate signing and the tamper test, the poisoning detector against injected defects, size-stratified AP, FID sampling, budget audits, the reconstruction attack, composition, leakage patterns and the regulatory mapping. The end-to-end test runs every real stage on an encrypted fixture and expects an overall PASS.
+The suites cover decryption and manifest checks, key loading, every handoff contract, the stage graph and gates, Laplace noise and its accounting, DP-SGD budgets and the halt, the attack features, the stress test and calibrated attack, certificate signing, the PDF certificates and the tamper tests, the poisoning detector against injected defects, size-stratified AP, FID sampling, budget audits, the reconstruction attack, composition, leakage patterns and the regulatory mapping. The end-to-end test runs every real stage on an encrypted fixture and expects an overall PASS.
 
 Install the commit checks once per clone. They block `.env` files, keys, unprivatized statistics, datasets, model weights and em or en dashes, and run the linter:
 
@@ -192,7 +195,7 @@ Every push runs the same checks on GitHub Actions: the commit checks, each compo
 |---|---|---|---|---|
 | Calibration | Laplace | ε = 1.8 in total, 0.257 per query over 7 queries | The real driving statistics | Audit log, reconstruction attack, composition check |
 | Training | DP-SGD (Opacus, RDP) | ε 1, 3 or 8, δ = 1e-5, halt at 10 | The synthetic training frames | Signed audit report and budget log per run |
-| Validation | Membership inference | | | Attack AUC per configuration and seed |
+| Validation | Membership inference | | | Shadow-model and loss-threshold attacks per configuration and seed; a five-seed stress test against an overfitted control; a reference-calibrated attack at 1% FPR |
 
 The two budgets protect different data, so they are reported separately and never added.
 
@@ -214,9 +217,9 @@ BSc (Hons) in Information Technology, specializing in Cyber Security. Sri Lanka 
 * `shared/r26_common`: decryption and manifest checks, YOLO label parsing, key loading and hashing, used in the same form by every component.
 * `shared/r26_contracts`: the 16 handoff schemas and the validator.
 * `pipeline/r26_pipeline`: the runner, run state and lineage, the integrated report, and one stage module per component.
-* `Privacy-Integration/`: calibration, the DP-SGD trainer, the attack and the certificate.
+* `Privacy-Integration/`: calibration, the DP-SGD trainer, the attacks, the stress tests and the certificate.
 * `Utility-Evaluation/`: decryption, the poisoning detector, dataset building, YOLO training and evaluation.
-* `Risk-Compliance/`: the independent checks and the regulatory mapping.
+* `Risk-Compliance/`: the independent checks, the regulatory mapping and the compliance certificate.
 * `Dataset-Generation/`: the CARLA capture script and its security engine. Runs on its own; its output feeds the pipeline.
 
 ```
@@ -229,14 +232,15 @@ pipeline/
     stages/             base, privacy, utility, compliance
 Privacy-Integration/
   privacy_integration/  calibration, training, attack, evaluation, audit, data, models
-  scripts/              run_calibration, run_training, run_mia_study, build_report, build_certificate
+  scripts/              run_calibration, run_training, run_mia_study, run_stress_test,
+                        run_calibrated_stress, build_report, build_certificate
 Utility-Evaluation/
   utility_evaluation/   decryption, poisoning, alignment, conversion, kitti, detection, fid,
                         training, study, joint, reporting
   scripts/              one file per step
 Risk-Compliance/
   risk_compliance/      verification, budget_audit, reconstruction, composition, manifest,
-                        leakage, anonymity, mapping
+                        leakage, anonymity, mapping, certificate
   scripts/              one file per check
 Dataset-Generation/
   scripts/              capture_town, security_engine, rbac_gateway
@@ -254,6 +258,7 @@ Dataset-Generation/
 | `utility_results.json` | Utility Evaluation | Privacy Integration, Risk and Compliance |
 | `privacy_certificate.json` | Privacy Integration | Release |
 | `compliance_report.json` | Risk and Compliance | Release |
+| `privacy_certificate.pdf`, `compliance_certificate.pdf` | Privacy Integration, Risk and Compliance | Printed for review and signing (not copied into `release/`) |
 | `pipeline_report.json` | Pipeline | Release |
 
 `calibration_audit_log.json` is never released: published value minus logged noise is the real statistic.
@@ -279,7 +284,7 @@ Values already set in the environment win. Otherwise keys come from the file nam
 | Document | For |
 |---|---|
 | [shared/INTERFACES.md](shared/INTERFACES.md) | Every handoff between components: format, producer and consumer |
-| [Privacy-Integration/README.md](Privacy-Integration/README.md) | Calibration, DP-SGD, the attack, the certificate and the design decisions |
+| [Privacy-Integration/README.md](Privacy-Integration/README.md) | Calibration, DP-SGD, the attacks, the stress tests, the certificate and the design decisions |
 | [Utility-Evaluation/README.md](Utility-Evaluation/README.md) | The working folder, the steps in order, poisoning detection and interpreting results |
-| [Risk-Compliance/README.md](Risk-Compliance/README.md) | Each check, its method, the regulatory mapping and declared weaknesses |
+| [Risk-Compliance/README.md](Risk-Compliance/README.md) | Each check, its method, the regulatory mapping, declared weaknesses and the certificate |
 | [Dataset-Generation/README.md](Dataset-Generation/README.md) | Running a capture, per-town settings and the output layout |
