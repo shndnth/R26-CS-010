@@ -100,7 +100,7 @@ class PrivacyAuditInterface:
                 "data_minimisation": (
                     "Only aggregate statistics entered the pipeline. No raw records retained."
                 ),
-                "sri_lanka_pdpa": "Purpose limitation and data minimisation principles observed.",
+                "gdpr_article_5": "Purpose limitation and data minimisation principles observed.",
             },
             "overall_status": "PASSED" if (target_met and budget_ok) else "FAILED",
         }

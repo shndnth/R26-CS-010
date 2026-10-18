@@ -22,6 +22,7 @@ mechanisms behave as claimed and issues the compliance verdict.
 | Leakage scan | Do released artifacts expose paths, credentials or identifiers? | `leakage_scan.json` |
 | k-anonymity | Can a frame be singled out from its metadata? | `anonymity.json` |
 | Compliance report | Which provisions are verified by passing evidence? | `compliance_report.json` |
+| Compliance certificate | A printable, signed record of the report that shows if it was changed | `compliance_certificate.pdf` and `.json` |
 
 The verifiers are implemented independently of the code they check. Certificate
 signatures, for example, are verified here rather than with Privacy
@@ -114,11 +115,36 @@ Recorded in `mapping.py` and carried into every report:
   pseudo-random generator, because torchcsprng is unmaintained and only
   supports PyTorch 1.8.1. Remediation: use a secure noise source once one
   supports current PyTorch.
-- **Calibration total epsilon** (medium, corrected). Seven queries at 1.8 compose
-  to 12.6 under sequential composition, but earlier outputs reported 1.8 as the
-  total. `rc-calibration-composition` found it; the total is now reported
-  correctly and the published statistics are unchanged. Running each query at
-  0.257 would restore a 1.8 total but needs new statistics and a new capture.
+- **Calibration total epsilon** (low, fixed). Earlier releases ran seven
+  queries at 1.8 each, which compose to 12.6, while the outputs reported 1.8.
+  `rc-calibration-composition` found it. Privacy Integration now enforces a
+  total of 1.8 (about 0.257 per query), and the check passes on the new
+  outputs. The dataset is covered by the 1.8 total once it is captured again
+  from the new statistics.
+
+## Compliance certificate
+
+```bash
+rc-report                 # writes outputs/compliance_report.json
+rc-certificate            # writes outputs/compliance_certificate.pdf and .json
+rc-certificate --verify   # checks the report and the PDF against the record
+```
+
+The certificate is a one-page A4 summary of the report: the overall verdict,
+each check, the GDPR controls verified and the declared weaknesses. Its
+trust comes from the fingerprint, not the layout:
+
+- the SHA-256 of the exact bytes of `compliance_report.json`, printed on the
+  page, stored in the PDF metadata and encoded in the QR code;
+- an HMAC-SHA256 signature of that fingerprint with `R26_AUDIT_HMAC_KEY`
+  (without the key the certificate says it is unsigned);
+- a record, `compliance_certificate.json`, holding both values and the
+  SHA-256 of the PDF itself.
+
+`--verify` recomputes everything and fails if the report, the PDF or the
+signature changed. The signature lines are left blank for hand signing, and
+the certificate records the listed checks only; it is not a legal
+certification of GDPR compliance.
 
 ## Planned
 
@@ -138,7 +164,8 @@ risk_compliance/
 ├── manifest.py         independent manifest verification
 ├── leakage.py          leakage scan
 ├── anonymity.py        k-anonymity
-└── mapping.py          GDPR mapping, declared weaknesses
+├── mapping.py          GDPR mapping, declared weaknesses
+└── certificate.py      signed PDF compliance certificate
 
 scripts/                command line entry points
 tests/

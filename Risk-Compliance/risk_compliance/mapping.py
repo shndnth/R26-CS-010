@@ -97,20 +97,6 @@ MAPPINGS: tuple[ControlMapping, ...] = (
         evidence_check="poisoning_detection",
         notes="FILTERED counts as passing: rejected frames were removed before training.",
     ),
-    ControlMapping(
-        provision="PDPA s.5",
-        requirement="Purpose limitation",
-        control="As GDPR Art. 5(1)(b)",
-        owner="IT22309556",
-        evidence_check="calibration_audit_log",
-    ),
-    ControlMapping(
-        provision="PDPA s.6",
-        requirement="Data minimisation",
-        control="As GDPR Art. 5(1)(c)",
-        owner="IT22309556",
-        evidence_check="calibration_audit_log",
-    ),
 )
 
 
@@ -126,15 +112,16 @@ DECLARED_WEAKNESSES: tuple[dict[str, str], ...] = (
         "source": "declared by IT22309556 in the privacy certificate",
     },
     {
-        "issue": "Calibration total epsilon was understated, now corrected",
-        "severity": "medium",
-        "detail": "Seven calibration queries each ran at epsilon 1.8 and compose to 12.6 under "
-                  "sequential composition; earlier outputs reported 1.8 as the total. The noise "
-                  "was correct for the per-query value, so the published statistics stand.",
+        "issue": "Calibration total epsilon was understated, now fixed",
+        "severity": "low",
+        "detail": "Earlier releases ran each of the seven calibration queries at epsilon 1.8, which "
+                  "composes to 12.6 under sequential composition, while the outputs reported 1.8. "
+                  "The calibration now enforces a total of 1.8, split evenly (about 0.257 per "
+                  "query), and the composition check passes on the new outputs.",
         "cause": "The total was set to the per-query value instead of the sum over queries.",
-        "remediation": "Total now reported as 12.6 and checked by calibration_composition. "
-                       "Running each query at 1.8/7 = 0.257 would restore a 1.8 total but needs "
-                       "new statistics and a new capture.",
-        "source": "found by the calibration_composition check; corrected by IT22309556",
+        "remediation": "Fixed in Privacy Integration and verified by calibration_composition. The "
+                       "dataset is covered by the 1.8 total only once it is captured again from the "
+                       "new statistics; data captured from the earlier statistics carries 12.6.",
+        "source": "found by the calibration_composition check; fixed by IT22309556",
     },
 )

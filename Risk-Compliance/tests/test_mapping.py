@@ -14,9 +14,8 @@ class TestMappings:
         ):
             assert expected in provisions
 
-    def test_covers_sri_lanka_pdpa(self):
-        provisions = {m.provision for m in MAPPINGS}
-        assert any(p.startswith("PDPA") for p in provisions)
+    def test_maps_to_gdpr_only(self):
+        assert all(m.provision.startswith("GDPR") for m in MAPPINGS)
 
     def test_every_mapping_names_an_owner(self):
         assert all(m.owner for m in MAPPINGS)
@@ -46,5 +45,5 @@ class TestDeclaredWeaknesses:
 
     def test_calibration_total_correction_is_recorded(self):
         [weakness] = [w for w in DECLARED_WEAKNESSES if "calibration total" in w["issue"].lower()]
-        assert "12.6" in weakness["detail"]
-        assert "0.257" in weakness["remediation"]
+        assert "12.6" in weakness["detail"] and "0.257" in weakness["detail"]
+        assert "captured again" in weakness["remediation"]

@@ -18,6 +18,7 @@ dependencies = [
     "matplotlib>=3.7",
     "pyyaml>=6.0",
     "pycryptodome>=3.20",
+    "reportlab>=4.0",
 ]
 
 [project.optional-dependencies]
@@ -34,6 +35,7 @@ rc-anonymity     = "scripts.measure_anonymity:main"
 rc-verify-manifest = "scripts.verify_manifest:main"
 rc-calibration-composition = "scripts.calibration_composition:main"
 rc-report        = "scripts.build_compliance_report:main"
+rc-certificate   = "scripts.build_certificate:main"
 
 [tool.setuptools.packages.find]
 include = ["risk_compliance*", "scripts*"]

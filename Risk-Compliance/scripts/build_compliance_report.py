@@ -115,7 +115,7 @@ def main() -> None:
             "PASS requires every check to have been run and passed. INCOMPLETE means "
             "one or more checks are outstanding, which is not the same as a failure. "
             "This verdict covers the checks listed above; it is not a statement that "
-            "the system satisfies every obligation under GDPR or the PDPA."
+            "the system satisfies every obligation under the GDPR."
         ),
     }
 
