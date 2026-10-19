@@ -6,8 +6,9 @@ signature from privacy_certificate_signature.json, stores the hash in the PDF
 metadata and a QR code, and writes a record with the SHA-256 of the PDF
 itself, so `verify_pdf` shows that neither file changed. It matches the
 Risk and Compliance certificate in layout. It is a project record of the
-privacy guarantees enforced and tested, not a legal certification, and its
-signature lines are left blank to be signed by hand.
+privacy guarantees enforced and tested, not a legal certification. It
+has one signature line, left blank to be signed by hand by the component
+lead.
 """
 
 from __future__ import annotations
@@ -25,10 +26,10 @@ PROJECT_TITLE = "Privacy-Enhanced Synthetic Data Generation for Autonomous Vehic
 INSTITUTION = "Sri Lanka Institute of Information Technology"
 CONFIG_LABELS = {"no_dp": "No DP (control)", "config_a": "Strong", "config_b": "Medium", "config_c": "Weak"}
 
-SIGNATORIES: tuple[tuple[str, str, str], ...] = (
-    ("Issued by", "Priyadarshi S.A.S.D. (IT22309556)", "Privacy Integration"),
-    ("Verified by", "Wijesinghe R.D.P.T. (IT22066916)", "Risk and Compliance"),
-    ("Reviewed by", "Prof. Anuradha Jayakody", "Supervisor"),
+SIGNATORY: tuple[str, str, str] = (
+    "Priyadarshi S.A.S.D.",
+    "Component Lead, Privacy Integration (IT22309556)",
+    f"{PROJECT} Privacy Assurance",
 )
 
 INK = (0.08, 0.13, 0.24)
@@ -204,6 +205,44 @@ def _seal(c, cx: float, cy: float, radius: float, color, verdict: str) -> None:
     c.restoreState()
 
 
+def _signature_block(
+    c,
+    left: float,
+    right: float,
+    top: float,
+    signer: tuple[str, str, str],
+    issued: str,
+    cert_id: str,
+) -> None:
+    """One company-style signature: issue details on the left, one signature line on the right.
+
+    The line is left blank to be signed by hand by the component lead.
+    """
+    name, title, org = signer
+    c.setFillColorRGB(*MUTED)
+    c.setFont("Helvetica", 7.5)
+    c.drawString(left, top - 8, "DATE OF ISSUE")
+    c.drawString(left, top - 36, "CERTIFICATE ID")
+    c.setFillColorRGB(*INK)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(left, top - 21, issued)
+    c.drawString(left, top - 49, cert_id)
+
+    bw = 220
+    bx = right - bw
+    line_y = top - 40
+    c.setStrokeColorRGB(*INK)
+    c.setLineWidth(0.8)
+    c.line(bx, line_y, right, line_y)
+    c.setFillColorRGB(*INK)
+    c.setFont("Helvetica-Bold", 9.5)
+    c.drawString(bx, line_y - 13, name)
+    c.setFillColorRGB(*MUTED)
+    c.setFont("Helvetica", 8.3)
+    c.drawString(bx, line_y - 24, title)
+    c.drawString(bx, line_y - 34, org)
+
+
 def render(data: PdfData, output: Path) -> None:
     from reportlab.graphics import renderPDF
     from reportlab.graphics.barcode.qr import QrCodeWidget
@@ -247,7 +286,7 @@ def render(data: PdfData, output: Path) -> None:
     y -= 30
     intro = (
         f"This certificate records the differential privacy guarantees enforced and tested by the "
-        f"Privacy Integration component of {PROJECT}, {PROJECT_TITLE}. It summarises "
+        f"Privacy Integration component of {PROJECT}, {PROJECT_TITLE}. It summarizes "
         "privacy_certificate.json; the SHA-256 fingerprint below identifies that file exactly, and "
         "Risk and Compliance verifies its signature independently."
     )
@@ -342,21 +381,8 @@ def render(data: PdfData, output: Path) -> None:
     c.drawString(tx, ty - 80, f"Issued {data.issued_at.replace('T', ' ').replace('+00:00', ' UTC')}.")
     y -= box_h + 12
 
-    col_w = (width - 2 * m - 36) / 3
-    for i, (role, name, title) in enumerate(SIGNATORIES):
-        x = m + i * (col_w + 18)
-        c.setFillColorRGB(*MUTED)
-        c.setFont("Helvetica-Oblique", 8.5)
-        c.drawString(x, y, role)
-        c.setStrokeColorRGB(*INK)
-        c.setLineWidth(0.7)
-        c.line(x, y - 28, x + col_w, y - 28)
-        c.setFillColorRGB(*INK)
-        c.setFont("Helvetica-Bold", 9)
-        c.drawString(x, y - 41, name)
-        c.setFont("Helvetica", 8.5)
-        c.setFillColorRGB(*MUTED)
-        c.drawString(x, y - 53, f"{title}    Date: ____________")
+    issued = data.issued_at[:10]
+    _signature_block(c, m, width - m, y, SIGNATORY, issued, data.cert_id)
 
     c.setFont("Helvetica", 7.8)
     c.setFillColorRGB(*MUTED)

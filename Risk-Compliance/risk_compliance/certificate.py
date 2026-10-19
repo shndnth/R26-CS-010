@@ -7,8 +7,8 @@ HMAC-SHA256. A sidecar JSON records the same values plus the SHA-256 of the
 PDF itself, so `verify_certificate` can show that neither file was changed.
 
 The certificate is a project verification record. It is not a legal
-certification of GDPR compliance, and the signature lines are left blank to
-be signed by hand.
+certification of GDPR compliance. It has one signature line, left blank to
+be signed by hand by the component lead.
 """
 
 from __future__ import annotations
@@ -36,10 +36,10 @@ CHECK_LABELS: dict[str, str] = {
     "poisoning_detection": "Data poisoning detection",
 }
 
-SIGNATORIES: tuple[tuple[str, str, str], ...] = (
-    ("Verified by", "Wijesinghe R.D.P.T. (IT22066916)", "Risk and Compliance"),
-    ("Reviewed by", "Prof. Anuradha Jayakody", "Supervisor"),
-    ("Reviewed by", "Mr. Dinith Primal", "Co-Supervisor"),
+SIGNATORY: tuple[str, str, str] = (
+    "Wijesinghe R.D.P.T.",
+    "Component Lead, Risk and Compliance (IT22066916)",
+    f"{PROJECT} Risk and Compliance",
 )
 
 
@@ -178,6 +178,44 @@ def _seal(c, cx: float, cy: float, radius: float, color: tuple[float, float, flo
     c.restoreState()
 
 
+def _signature_block(
+    c,
+    left: float,
+    right: float,
+    top: float,
+    signer: tuple[str, str, str],
+    issued: str,
+    cert_id: str,
+) -> None:
+    """One company-style signature: issue details on the left, one signature line on the right.
+
+    The line is left blank to be signed by hand by the component lead.
+    """
+    name, title, org = signer
+    c.setFillColorRGB(*MUTED)
+    c.setFont("Helvetica", 7.5)
+    c.drawString(left, top - 8, "DATE OF ISSUE")
+    c.drawString(left, top - 36, "CERTIFICATE ID")
+    c.setFillColorRGB(*INK)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(left, top - 21, issued)
+    c.drawString(left, top - 49, cert_id)
+
+    bw = 220
+    bx = right - bw
+    line_y = top - 40
+    c.setStrokeColorRGB(*INK)
+    c.setLineWidth(0.8)
+    c.line(bx, line_y, right, line_y)
+    c.setFillColorRGB(*INK)
+    c.setFont("Helvetica-Bold", 9.5)
+    c.drawString(bx, line_y - 13, name)
+    c.setFillColorRGB(*MUTED)
+    c.setFont("Helvetica", 8.3)
+    c.drawString(bx, line_y - 24, title)
+    c.drawString(bx, line_y - 34, org)
+
+
 def render_pdf(data: CertificateData, output: Path) -> None:
     from reportlab.graphics import renderPDF
     from reportlab.graphics.barcode.qr import QrCodeWidget
@@ -225,7 +263,7 @@ def render_pdf(data: CertificateData, output: Path) -> None:
     intro = (
         f"This certificate records the result of the independent compliance verification of the "
         f"{PROJECT} pipeline, {PROJECT_TITLE}, carried out by the Risk and Compliance component. "
-        "It summarises compliance_report.json. The SHA-256 fingerprint below identifies that report "
+        "It summarizes compliance_report.json. The SHA-256 fingerprint below identifies that report "
         "exactly: if a single byte of the report changes, the fingerprint no longer matches."
     )
     c.setFont("Helvetica", 10.5)
@@ -318,22 +356,8 @@ def render_pdf(data: CertificateData, output: Path) -> None:
     c.drawString(tx, ty - 88, f"Certificate issued {issued}.  Report generated {generated} UTC.")
     y -= box_h + 26
 
-    # Signature lines, left blank to be signed by hand.
-    col_w = (width - 2 * margin - 2 * 18) / 3
-    for i, (role, name, title) in enumerate(SIGNATORIES):
-        x = margin + i * (col_w + 18)
-        c.setFillColorRGB(*MUTED)
-        c.setFont("Helvetica-Oblique", 8.5)
-        c.drawString(x, y, role)
-        c.setStrokeColorRGB(*INK)
-        c.setLineWidth(0.7)
-        c.line(x, y - 34, x + col_w, y - 34)
-        c.setFillColorRGB(*INK)
-        c.setFont("Helvetica-Bold", 9.5)
-        c.drawString(x, y - 48, name)
-        c.setFont("Helvetica", 8.5)
-        c.setFillColorRGB(*MUTED)
-        c.drawString(x, y - 60, f"{title}    Date: ____________")
+    # One digital signature, company style.
+    _signature_block(c, margin, width - margin, y, SIGNATORY, data.issued_at[:10], data.cert_id)
 
     # Footer.
     c.setFont("Helvetica", 7.8)
