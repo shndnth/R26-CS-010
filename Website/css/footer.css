@@ -1,4 +1,4 @@
-/* MURAGALA: The footer card. */
+/* R26-CS-010: The footer card. */
 
 /* A floating card that matches the nav. */
 .footer { padding: 0 var(--edge) var(--bar-top); }

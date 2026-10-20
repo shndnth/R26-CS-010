@@ -1,5 +1,5 @@
 /*
- * R26-CS-010 · MURAGALA research website.
+ * R26-CS-010 research website.
  *
  * A single page of readable sections. One part of Domain, "Research at a
  * glance", is a short pinned story: one GSAP timeline, scrubbed by scroll,
@@ -7,7 +7,7 @@
  * prefers-reduced-motion, or without JavaScript, every part is a plain
  * section and the story steps show still drawings.
  *
- * Each file in js/ adds its parts to one shared namespace (window.MURAGALA);
+ * Each file in js/ adds its parts to one shared namespace (window.R26SITE);
  * index.html loads them in order and this file, last, wires them together.
  * Plain scripts (not modules), so the page also works when opened as a file.
  * Where to edit:
@@ -22,7 +22,7 @@
  */
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const {
     root, $, breathe, initNavMenu, sizeLines, createLine, buildScenes, centerScenes, finishScenes,
     createLogo, readTheme, createPager, buildTimeline, pinDeck, renderStills, createSmoothScroll,
@@ -34,7 +34,7 @@
     const gsap = window.gsap;
     const ST = window.ScrollTrigger;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const motion = !reduce && !window.MURAGALA_FORCE_STATIC && !!gsap && !!ST;
+    const motion = !reduce && !window.R26_FORCE_STATIC && !!gsap && !!ST;
     if (!motion) {
       root.classList.remove('motion');
       root.classList.add('static');
@@ -98,10 +98,10 @@
     // Setup crashed part way (for example, a browser serving a stale copy of
     // one file). Rather than leave a half-built page, reload once in the
     // plain readable layout. If even that fails, just show the plain layout.
-    console.error('MURAGALA setup failed:', err);
-    if (!window.MURAGALA_FORCE_STATIC) {
+    console.error('R26 site setup failed:', err);
+    if (!window.R26_FORCE_STATIC) {
       try {
-        sessionStorage.setItem('muragala-static', '1');
+        sessionStorage.setItem('r26-static', '1');
         location.reload();
         return;
       } catch (e) {}

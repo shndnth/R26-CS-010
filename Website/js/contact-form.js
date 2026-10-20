@@ -3,7 +3,7 @@
 // Without JavaScript the form still posts normally to the same address.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $ } = M;
 
   const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,13 +63,14 @@
       const name = form.elements.name.value.trim().split(/\s+/)[0];
       const email = form.elements.email.value.trim();
 
-      // Demonstration mode (for the viva): until a form service is connected,
-      // a valid message is accepted and confirmed, but it is NOT stored or
-      // emailed anywhere. Once [FORM_ID] is replaced in the form's action,
-      // messages are sent for real.
-      if (form.action.includes('[FORM_ID]')) {
-        form.reset();
-        open('ok', 'Message submitted', `Thank you, ${name}.`);
+      // No form service yet ([FORM_ID] still in the action): hand the message to
+      // the visitor's own email app, addressed to the team, so nothing is lost.
+      if ((form.getAttribute('action') || '').includes('[FORM_ID]')) {
+        const to = form.dataset.mailto;
+        const subject = `[R26-CS-010] ${form.elements.subject.value.trim()}`;
+        const body = `${form.elements.message.value.trim()}\n\n${form.elements.name.value.trim()} (${email})`;
+        window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        open('ok', 'Almost done', `Thank you, ${name}. Your email app has opened with the message ready; press send there to deliver it.`);
         return;
       }
 

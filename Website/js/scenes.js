@@ -4,7 +4,7 @@
 // in css/lineart.css: accent = protection, hot = people and risk, cool = data.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { f1, rad, rand, scatter, SHAPES, NODES } = M;
 
   function buildScenes(stage) {

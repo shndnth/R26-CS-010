@@ -121,6 +121,25 @@ p, li, dd { text-wrap: pretty; }
   .footer__word .ch:hover { transform: none; }
 }
 
+/* ---------- Phones: layouts that must use the full width ---------- */
+
+@media (max-width: 560px) {
+  /* Milestone filter: a 2 x 2 grid, so no tab wraps on its own. */
+  .tl-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    border-radius: 24px;
+  }
+  .tl-tabs label { justify-content: center; text-align: center; padding: 0 10px; }
+
+  /* Supervisors: full-width cards, like the student cards above them. */
+  .people-grid--two { grid-template-columns: 1fr; }
+
+  /* Contact form: a full-width send button. */
+  .contact-form__send { justify-self: stretch; width: 100%; }
+}
+
 /* ---------- Small phones (about 360px wide) ---------- */
 
 @media (max-width: 380px) {

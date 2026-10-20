@@ -1,7 +1,7 @@
 // Keep every line drawing's strokes near 1.75px on screen, at any size.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $$ } = M;
 
   function sizeLines() {

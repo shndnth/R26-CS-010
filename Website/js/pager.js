@@ -2,7 +2,7 @@
 // far through it, and links to jump. The timeline registers chapters.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $ } = M;
 
   function createPager(motion) {

@@ -1,4 +1,4 @@
-/* MURAGALA: The research website's reading sections: hero, section headings,
+/* R26-CS-010: The research website's reading sections: hero, section headings,
    Domain (literature, gap table, problem, objectives, methodology, findings,
    technologies), Milestones, Documents, Presentations, About Us, Contact Us. */
 
@@ -294,7 +294,7 @@
 .pipeline:not(.is-pending) .pipeline__node { border-color: var(--accent); }
 
 .method-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
-.method-step__title { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.method-step__title { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; }
 .method-step__title span {
   display: inline-grid;
   place-items: center;

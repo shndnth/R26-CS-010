@@ -7,7 +7,7 @@
 // With `live` false only the drawings are built (for the reduced-motion stills).
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, $$, f1 } = M;
 
   function buildTimeline(ctx, live) {

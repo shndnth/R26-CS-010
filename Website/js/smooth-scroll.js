@@ -3,7 +3,7 @@
 // native scrolling. `scrollToY` is the one way the page jumps anywhere.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
 
   function createSmoothScroll() {
     const gsap = window.gsap;

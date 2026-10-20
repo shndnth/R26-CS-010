@@ -3,7 +3,7 @@
 // 7 seal, 8 route. Each is resampled to N points so any two can blend.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { N, lerp, rad, seg, cubic, arc, join, through, resample } = M;
 
   const sealPt = (d) => {

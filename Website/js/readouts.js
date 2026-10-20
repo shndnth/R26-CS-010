@@ -1,7 +1,7 @@
 // The hero image reveal (top to bottom, on load).
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $ } = M;
 
   function createLogo() {

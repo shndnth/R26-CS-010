@@ -4,7 +4,7 @@
 // attributes the scroll timeline does not animate.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, N, f1, SHAPES } = M;
 
   function startLife(ctx) {

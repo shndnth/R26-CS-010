@@ -2,7 +2,7 @@
 // and a seeded random so the dot clouds look the same on every visit.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
 
   const N = 300; // points per shape
   const lerp = (a, b, t) => a + (b - a) * t;

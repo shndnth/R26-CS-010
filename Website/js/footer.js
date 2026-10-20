@@ -3,7 +3,7 @@
 // letter. Motion only; otherwise the footer simply shows, with its border.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, $$ } = M;
 
   function initFooter(motion) {

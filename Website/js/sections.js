@@ -3,7 +3,7 @@
 // Everything here also works, or degrades to plain content, without motion.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, $$ } = M;
 
   // Hero counters count up from zero on load (motion only; the HTML holds the real values).

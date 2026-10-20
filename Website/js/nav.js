@@ -1,7 +1,7 @@
 // The small-screen menu: open, close on link click, outside click or Escape.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $ } = M;
 
   function initNavMenu() {

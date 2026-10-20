@@ -4,7 +4,7 @@
 // always starts at the top.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { sizeLines } = M;
 
   function initLinks(ctx) {

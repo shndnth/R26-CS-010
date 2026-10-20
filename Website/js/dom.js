@@ -1,7 +1,7 @@
 // Small DOM helpers shared by every module.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
 
   const root = document.documentElement;
   const $ = (s, c = document) => c.querySelector(s);

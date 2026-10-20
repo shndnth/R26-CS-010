@@ -2,7 +2,7 @@
 // drawing, taken from the same timeline at that scene's finished stop.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, buildTimeline, sizeLines } = M;
 
   function renderStills(ctx) {

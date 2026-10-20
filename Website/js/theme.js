@@ -1,7 +1,7 @@
 // Theme colors, read from the stylesheet so the drawing always matches it.
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { root } = M;
 
   function readTheme() {

@@ -2,7 +2,7 @@
 // L.d0 and L.d1 are the visible span along it (0 to 1).
 (() => {
   'use strict';
-  const M = (window.MURAGALA = window.MURAGALA || {});
+  const M = (window.R26SITE = window.R26SITE || {});
   const { $, N, f1, SHAPES, lastShape } = M;
 
   function createLine(stage) {
