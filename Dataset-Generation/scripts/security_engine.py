@@ -1,3 +1,15 @@
+"""AES-256 encryption and SHA-256 hashing for the CARLA capture.
+
+Two file formats are supported:
+
+    cbc (default)  [16-byte IV][AES-256-CBC ciphertext, PKCS7 padded]
+    gcm            [16-byte nonce][16-byte tag][AES-256-GCM ciphertext]
+
+CBC is the format of the delivered dataset and the one Utility Evaluation
+decrypts. GCM is authenticated: a changed byte makes decryption fail instead of
+returning corrupted data. Select it with ``--cipher gcm`` in capture_town.py.
+"""
+
 import hashlib
 import os
 
@@ -6,6 +18,11 @@ from Crypto.Util.Padding import pad, unpad
 
 KEY_VARIABLE = "R26_DATASET_AES_KEY"
 ENV_FILE_VARIABLE = "R26_ENV_FILE"
+
+CIPHER_MODES = ("cbc", "gcm")
+IV_BYTES = 16
+NONCE_BYTES = 16
+TAG_BYTES = 16
 
 
 def load_project_env():
@@ -48,13 +65,20 @@ def dataset_key():
 
 
 class SecurityEngine:
-    def __init__(self, key=None):
+    def __init__(self, key=None, mode="cbc"):
         # No random fallback: a key nobody holds would make the dataset unrecoverable.
         if key is None:
             key = dataset_key()
         if len(key) != 32:
             raise ValueError(f"AES-256 key must be 32 bytes, got {len(key)}")
+        if mode not in CIPHER_MODES:
+            raise ValueError(f"cipher mode must be one of {CIPHER_MODES}, got {mode!r}")
         self.key = key
+        self.mode = mode
+
+    @property
+    def label(self):
+        return f"AES-256-{self.mode.upper()}"
 
     def generate_sha256(self, file_path):
         """Creates a digital fingerprint for integrity verification."""
@@ -64,17 +88,44 @@ class SecurityEngine:
                 sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
 
-    def encrypt_data(self, file_path):
-        """Encrypts one file with AES-256-CBC and removes the plaintext."""
+    # In-memory operations, used by the file methods and by the security audit.
+
+    def encrypt_bytes(self, data):
+        """Encrypt bytes into the on-disk format of the selected mode."""
+        if self.mode == "gcm":
+            cipher = AES.new(self.key, AES.MODE_GCM, nonce=os.urandom(NONCE_BYTES))
+            ciphertext, tag = cipher.encrypt_and_digest(data)
+            return cipher.nonce + tag + ciphertext
         cipher = AES.new(self.key, AES.MODE_CBC)
+        return cipher.iv + cipher.encrypt(pad(data, AES.block_size))
+
+    def decrypt_bytes(self, blob):
+        """Decrypt bytes in the selected format. Raises ValueError if they do not decrypt.
+
+        In GCM mode a changed byte anywhere raises ValueError (tag check failed).
+        """
+        if self.mode == "gcm":
+            nonce = blob[:NONCE_BYTES]
+            tag = blob[NONCE_BYTES:NONCE_BYTES + TAG_BYTES]
+            cipher = AES.new(self.key, AES.MODE_GCM, nonce=nonce)
+            return cipher.decrypt_and_verify(blob[NONCE_BYTES + TAG_BYTES:], tag)
+        cipher = AES.new(self.key, AES.MODE_CBC, blob[:IV_BYTES])
+        return unpad(cipher.decrypt(blob[IV_BYTES:]), AES.block_size)
+
+    def header_bytes(self):
+        """Bytes before the ciphertext: the IV (CBC) or nonce and tag (GCM)."""
+        return NONCE_BYTES + TAG_BYTES if self.mode == "gcm" else IV_BYTES
+
+    # File operations used by the capture.
+
+    def encrypt_data(self, file_path):
+        """Encrypts one file and removes the plaintext."""
         with open(file_path, "rb") as f:
             data = f.read()
 
-        encrypted_bytes = cipher.encrypt(pad(data, AES.block_size))
-
         enc_file_path = file_path + ".enc"
         with open(enc_file_path, "wb") as f:
-            f.write(cipher.iv + encrypted_bytes)
+            f.write(self.encrypt_bytes(data))
 
         # The plaintext is removed only after the encrypted copy is fully written.
         os.remove(file_path)
@@ -84,11 +135,7 @@ class SecurityEngine:
         """Restores the original file next to the .enc file."""
         try:
             with open(enc_file_path, "rb") as f:
-                iv = f.read(16)
-                encrypted_data = f.read()
-
-            cipher = AES.new(self.key, AES.MODE_CBC, iv)
-            original_data = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+                original_data = self.decrypt_bytes(f.read())
 
             original_path = enc_file_path[:-4] if enc_file_path.endswith(".enc") else enc_file_path + ".dec"
             with open(original_path, "wb") as f:

@@ -35,6 +35,12 @@ def _parse_args():
         default=2000,
         help="frame sets to capture (default: 2000); use a small number for a test run",
     )
+    parser.add_argument(
+        "--cipher",
+        default="cbc",
+        choices=["cbc", "gcm"],
+        help="AES-256 mode (default: cbc, the delivered format); gcm adds tamper detection",
+    )
     return parser.parse_args()
 
 
@@ -625,7 +631,7 @@ def main():
     if not rbac.verify_access(USER_ROLE, "create"):
         return
 
-    crypto = SecurityEngine(key=SECRET_KEY)
+    crypto = SecurityEngine(key=SECRET_KEY, mode=_ARGS.cipher)
 
     client = carla.Client("localhost", 2000)
     client.set_timeout(60.0)
@@ -952,7 +958,7 @@ def main():
             "epsilon_total": CALIBRATION_PROFILE["calibration_epsilon_spent"],
             "security": {
                 "hashing": "SHA-256",
-                "encryption": "AES-256",
+                "encryption": f"AES-256-{_ARGS.cipher.upper()}",
                 "rbac_role": USER_ROLE,
                 "raw_png_removed_after_encryption": True
             },

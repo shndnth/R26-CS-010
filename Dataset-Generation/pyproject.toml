@@ -17,6 +17,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+# Charts for scripts/security_audit.py and the notebook.
+audit = ["matplotlib>=3.5", "ipython>=8.0"]
 
 [tool.setuptools]
 packages = []

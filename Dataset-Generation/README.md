@@ -40,6 +40,7 @@ Start the CARLA server, then capture one town at a time:
 ```bash
 python scripts/capture_town.py --town town01
 python scripts/capture_town.py --town town04 --sets 20     # short test run
+python scripts/capture_town.py --town town01 --cipher gcm  # authenticated encryption
 ```
 
 Output goes to `output/<town>/` under the current folder. Each run captures
@@ -87,7 +88,15 @@ town0X/
 └── town0X_config_metadata.json      scene configuration and calibration profile used
 ```
 
-Encryption format is `[16-byte IV][AES-256-CBC ciphertext, PKCS7 padded]`.
+Encryption format depends on `--cipher`, and `town0X_config_metadata.json` records which one was used:
+
+| `--cipher` | File format | Tamper detection |
+|---|---|---|
+| `cbc` (default) | `[16-byte IV][AES-256-CBC ciphertext, PKCS7 padded]` | by the SHA-256 manifest after decryption |
+| `gcm` | `[16-byte nonce][16-byte tag][AES-256-GCM ciphertext]` | built in: a changed byte fails decryption |
+
+The delivered dataset uses CBC, and Utility Evaluation decrypts CBC. Agree with
+Utility Evaluation before delivering a GCM capture.
 
 ## Privacy requirement
 
@@ -99,10 +108,44 @@ so the claim can be audited.
 
 ## Security modules
 
-`security_engine.py` encrypts each frame and removes the plaintext only after
+`security_engine.py` encrypts each frame (AES-256-CBC by default, or GCM) and removes the plaintext only after
 the encrypted copy is written. A missing or wrong-length key is an error rather
 than a silent random key, and decryption keeps the encrypted file unless asked
 to remove it. `rbac_gateway.py` restricts actions by role.
+
+## Security audit
+
+`scripts/security_audit.py` tests the real `SecurityEngine` and, optionally, a
+captured town folder:
+
+```bash
+pip install -e ".[audit]"
+python scripts/security_audit.py --mode gcm
+python scripts/security_audit.py --mode gcm --data-dir output/town01 --verify
+```
+
+| Test | Pass condition |
+|---|---|
+| Round trip | Decrypted bytes equal the original |
+| Nonce uniqueness | 30 encryptions of one file give 30 different IVs or nonces |
+| Byte distribution | Chi-square of ciphertext bytes below 293.25 (255 degrees of freedom, alpha 0.05) |
+| Ciphertext change | A 1-bit change in the file changes 45% to 55% of ciphertext bits |
+| Tamper detection | GCM rejects a changed byte; reported as not applicable for CBC |
+| Real folder | No `.png.enc` file starts with the PNG signature; with `--verify`, every file decrypts in memory and matches its manifest hash |
+
+Tests 1 to 5 use synthetic bytes and a random key held only in memory. The real
+folder check uses the project key from `.env` and writes no plaintext. Results
+and charts go to `outputs/security_audit/`, which is never committed.
+
+The ciphertext change test differs because every encryption uses a fresh IV or
+nonce. GCM is a stream mode, so reusing a nonce would change only the flipped
+bit; the nonce uniqueness test is what guards against that.
+
+`notebooks/security_audit.ipynb` runs the same audit and shows the charts.
+
+Recorded result, AES-256-GCM on a 6,093-image Town01 capture: all five synthetic
+tests passed (chi-square 272.59, 50.0% of bits changed, tampered file rejected)
+and 0 of 6,093 encrypted files were readable without the key.
 
 ## Tests
 
