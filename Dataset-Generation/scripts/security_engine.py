@@ -96,7 +96,7 @@ class SecurityEngine:
             cipher = AES.new(self.key, AES.MODE_GCM, nonce=os.urandom(NONCE_BYTES))
             ciphertext, tag = cipher.encrypt_and_digest(data)
             return cipher.nonce + tag + ciphertext
-        cipher = AES.new(self.key, AES.MODE_CBC)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv=os.urandom(IV_BYTES))
         return cipher.iv + cipher.encrypt(pad(data, AES.block_size))
 
     def decrypt_bytes(self, blob):
